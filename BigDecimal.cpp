@@ -86,6 +86,50 @@ BigDecimal BigDecimal::operator-(const BigDecimal& other)
 	return this->subtract(other);
 }
 
+string BigDecimal::multiply(const string& other)
+{
+	// 比较大小，让大的乘以小的
+	string num_a, num_b;
+	switch (compare(this->number, other))
+	{
+	case 0:
+	case 1:
+		num_a = this->number;
+		num_b = other;
+		break;
+	case -1:
+		num_a = other;
+		num_b = this->number;
+		break;
+	default:
+		break;;
+	}
+	// 遍历较小数的每一位，使其与较大数相乘，记录结果并相加
+	BigDecimal add_res("0"), mul_res("");
+	// 用于存储每一次的积，输出用
+	vector<string> mul_res_arr;
+	for (int i = num_b.size() - 1;i >= 0;i--)
+	{
+		// 先记录每一次乘法的结果
+		mul_res = BigDecimal(num_a).multiply_single(num_b[i], num_b.size() - i - 1);
+		mul_res_arr.emplace_back(mul_res.number);
+		// 乘法结果与当前的加法结果相加
+		add_res = mul_res + add_res;
+	}
+	multiply_print(num_a, num_b, add_res.number, mul_res_arr, "");
+	return add_res.number;
+}
+
+BigDecimal BigDecimal::multiply(const BigDecimal& other)
+{
+	return this->multiply(other.number);
+}
+
+BigDecimal BigDecimal::operator*(const BigDecimal& other)
+{
+	return this->multiply(other);
+}
+
 /**
  * @brief 检查输入的表达式是否合法
  * @param experssion 待检查的表达式
@@ -120,6 +164,34 @@ bool BigDecimal::check_expression(const string& experssion)
 	return true;
 }
 
+/**
+ * @brief 计算当前数乘以单个数的结果，并在结尾补0
+ * @param single 传入的字符
+ * @param i 需要补充的0的个数
+ */
+string BigDecimal::multiply_single(const char& single, int zero_num = 0)
+{
+	string ans;
+	const auto& str = this->number;
+	int tmp = 0;
+	for (int i = str.size() - 1;i >= 0;i--)
+	{
+		int mul_res = (str[i] - '0') * (single - '0') + tmp;
+		ans += mul_res % 10 + '0';
+		tmp = mul_res / 10;
+	}
+	if (tmp)
+	{
+		ans += tmp + '0';
+	}
+	std::reverse(ans.begin(), ans.end());
+	for (int i = 0;i < zero_num;i++)
+	{
+		ans += '0';
+	}
+	return ans;
+}
+
 // 比较str1和str2的大小，str1大返回1，相等返回0，str2返回-1
 int BigDecimal::compare(const string& str1, const string& str2)
 {
@@ -146,4 +218,52 @@ void BigDecimal::trim(string& str)
 	auto last = str.find_last_not_of(" ");
 	// str替换为first和last之间的位置
 	str = str.substr(first, last - first + 1);
+}
+
+/**
+ * @brief 用于乘法中的算式输出
+ * @param num1 乘数
+ * @param num2 被乘数
+ * @param res 相乘的结果
+ * @param arr 乘法过程中每一位的积
+ * @param file_path 输出到文件的路径
+ */
+void BigDecimal::multiply_print(const string& num1, const string& num2, const string& res, const vector<string>& arr, const string& file_path)
+{
+	// 输出第一行乘数
+	for (int i = 0;i < res.size() - num1.size();i++)
+	{
+		cout << " ";
+	}
+	cout << num1 << "\n";
+	// 输出第二行乘数
+	cout << "x";
+	for (int i = 0;i < res.size() - num2.size() - 1;i++)
+	{
+		cout << " ";
+	}
+	cout << num2 << "\n";
+	// 输出中间的线
+	for (int i = 0;i < res.size();i++)
+	{
+		cout << "-";
+	}
+	cout << "\n";
+	// 输出每个中间的积
+	for (int i = 0;i < arr.size();i++)
+	{
+		for (int j = 0;j < res.size() - arr[i].size();j++)
+		{
+			cout << " ";
+		}
+		cout << arr[i].substr(0, arr[i].size() - i) << "\n";
+	}
+	// 输出中间的线
+	for (int i = 0;i < res.size();i++)
+	{
+		cout << "-";
+	}
+	cout << "\n";
+	// 输出最后的积
+	cout << res << "\n";
 }

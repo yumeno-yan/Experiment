@@ -10,9 +10,9 @@ int main()
 	//	cout << s.score << " ";
 	//}
 	//cout << "\n";
-	BigDecimal a("114514141414");
-	BigDecimal b("1919810");
-	auto ans = a - b;
+	BigDecimal a("1234567");
+	BigDecimal b("1");
+	auto ans = b * a;
 	ans.show();
 	return 0;
 }
