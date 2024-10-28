@@ -3,6 +3,7 @@
 #include <iostream>
 #include <unordered_set>
 #include <map>
+#include <algorithm>
 
 using namespace std;
 
@@ -10,11 +11,11 @@ class BigDecimal
 {
 public:
 	BigDecimal(const string& str) :number(str) {}
-	// º”∑®
+	// Âä†Ê≥ï
 	string add(const string& other);
 	BigDecimal add(const BigDecimal& other);
 	BigDecimal operator+(const BigDecimal& other);
-	// ºı∑®
+	// ÂáèÊ≥ï
 	string subtract(const string& other);
 	BigDecimal subtract(const BigDecimal& other);
 	BigDecimal operator-(const BigDecimal& other);
