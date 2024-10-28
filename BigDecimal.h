@@ -11,8 +11,7 @@ using namespace std;
 // 用于定义输出的样式
 struct print_format
 {
-	int decimal_point; // 保留几位小数，默认为6
-	int scientific_notation; // 是否采用科学计数法，0-不采用，1-采用，2-自动，默认为自动
+	int significant_digits; // 是否采用科学计数法，-1-不采用，0-自动，n-保留n位有效数字
 };
 
 extern print_format pf;

@@ -1,6 +1,6 @@
 #include "BigDecimal.h"
 
-print_format pf = { 6,2 };
+print_format pf = { 2 };
 
 string BigDecimal::add(const string& other)
 {
@@ -115,7 +115,7 @@ string BigDecimal::multiply(const string& other)
 	BigDecimal add_res("0"), mul_res("");
 	// 用于存储每一次的积，输出用
 	vector<string> mul_res_arr;
-	for (int i = num_b.size() - 1;i >= 0;i--)
+	for (int i = num_b.size() - 1; i >= 0; i--)
 	{
 		// 先记录每一次乘法的结果
 		mul_res = BigDecimal(num_a).multiply_single(num_b[i], num_b.size() - i - 1);
@@ -142,21 +142,21 @@ string BigDecimal::divide(const string& other)
 	string str = this->number;
 	// 先将其补到相同位数
 	int point = other.size() > str.size() ? other.size() - str.size() : 0;
-	for (int i = 0;i < point;i++)
+	for (int i = 0; i < point; i++)
 	{
 		str += "0";
 	}
 	string ans;
 	// 计算要算的位数：整数部分+保留小数点位数+补0的个数
 	// 这里加上补0个数是为了转为科学计数法方法时防止位数不够
-	int digit_number = str.size() - other.size() + 2 + pf.decimal_point + point;
+	int digit_number = str.size() - other.size() + 2 + max(pf.significant_digits, 0) + point;
 	// 余数
 	string remainder = str.substr(0, other.size());
 	int k = other.size() - 1;
-	for (int i = 0;i <= digit_number;i++)
+	for (int i = 0; i <= digit_number; i++)
 	{
 		bool find = false;
-		for (int j = 1;j <= 10;j++)
+		for (int j = 1; j <= 10; j++)
 		{
 			if (j != 10)	// j==10的时候说明j一定为9
 			{
@@ -196,7 +196,7 @@ string BigDecimal::divide(const string& other)
 	// 先补上缺失的0
 	// string不可以直接在头元素插入，所以先翻转
 	std::reverse(ans.begin(), ans.end());
-	for (int i = 0;i < point;i++)
+	for (int i = 0; i < point; i++)
 	{
 		ans += '0';
 	}
@@ -262,7 +262,7 @@ string BigDecimal::multiply_single(const char& single, int zero_num = 0)
 	string ans;
 	const auto& str = this->number;
 	int tmp = 0;
-	for (int i = str.size() - 1;i >= 0;i--)
+	for (int i = str.size() - 1; i >= 0; i--)
 	{
 		int mul_res = (str[i] - '0') * (single - '0') + tmp;
 		ans += mul_res % 10 + '0';
@@ -273,7 +273,7 @@ string BigDecimal::multiply_single(const char& single, int zero_num = 0)
 		ans += tmp + '0';
 	}
 	std::reverse(ans.begin(), ans.end());
-	for (int i = 0;i < zero_num;i++)
+	for (int i = 0; i < zero_num; i++)
 	{
 		ans += '0';
 	}
@@ -325,28 +325,28 @@ void BigDecimal::trim(string& str)
 void BigDecimal::multiply_print(const string& num1, const string& num2, const string& res, const vector<string>& arr, const string& file_path)
 {
 	// 输出第一行乘数
-	for (int i = 0;i < res.size() - num1.size();i++)
+	for (int i = 0; i < res.size() - num1.size(); i++)
 	{
 		cout << " ";
 	}
 	cout << num1 << "\n";
 	// 输出第二行乘数
 	cout << "x";
-	for (int i = 0;i < res.size() - num2.size() - 1;i++)
+	for (int i = 0; i < res.size() - num2.size() - 1; i++)
 	{
 		cout << " ";
 	}
 	cout << num2 << "\n";
 	// 输出中间的线
-	for (int i = 0;i < res.size();i++)
+	for (int i = 0; i < res.size(); i++)
 	{
 		cout << "-";
 	}
 	cout << "\n";
 	// 输出每个中间的积
-	for (int i = 0;i < arr.size();i++)
+	for (int i = 0; i < arr.size(); i++)
 	{
-		for (int j = 0;j < res.size() - arr[i].size();j++)
+		for (int j = 0; j < res.size() - arr[i].size(); j++)
 		{
 			cout << " ";
 		}
@@ -358,7 +358,7 @@ void BigDecimal::multiply_print(const string& num1, const string& num2, const st
 		return;
 	}
 	// 输出中间的线
-	for (int i = 0;i < res.size();i++)
+	for (int i = 0; i < res.size(); i++)
 	{
 		cout << "-";
 	}
@@ -370,49 +370,56 @@ void BigDecimal::multiply_print(const string& num1, const string& num2, const st
 string BigDecimal::format_string(const string& str)
 {
 	string res;
-	// 先转为科学计数法，decimal表示实数部分，exp表示指数部分
+	// 科学计数法，decimal表示实数部分，exp表示指数部分
 	string decimal;
 	int exp = 0;
+	if (pf.significant_digits == -1)
+		return str;
+	// 如果要使用科学计数法
 	// 先找到小数点的位置
 	auto position = str.find_first_of(".");
-	// 如果要使用科学计数法
-	if (pf.scientific_notation != 0)
+	if (position != 1)	// 如果是大数，形如1234.5678
 	{
-		// 如果是大数，形如1234.5678
-		if (position != 1)
-		{
-			exp += position - 1;
-			// 将1234.5678分为1 . 234 5678四个部分
-			decimal = str.substr(0, 1) + "." + str.substr(1, position - 1) + str.substr(position + 1);
-		}
-		else if (str[0] == '0')	// 如果是较小数，形如0.000123456
-		{
-			// 找到第一个非0的位置
-			auto non_zero_position = str.find_first_not_of("0.");
-			exp -= non_zero_position - position;
-			decimal = str.substr(non_zero_position, 1) + "." + str.substr(non_zero_position + 1);
-		}
-		else	// 1.114514
-		{
-			exp = 0;
-			decimal = str;
-		}
+		exp += position - 1;
+		// 将1234.5678分为1 . 234 5678四个部分
+		decimal = str.substr(0, 1) + "." + str.substr(1, position - 1) + str.substr(position + 1);
 	}
-	else
+	else if (str[0] == '0')	// 如果是较小数，形如0.000123456
+	{
+		// 找到第一个非0的位置
+		auto non_zero_position = str.find_first_not_of("0.");
+		exp -= non_zero_position - position;
+		decimal = str.substr(non_zero_position, 1) + "." + str.substr(non_zero_position + 1);
+	}
+	else	// 形如1.114514
 	{
 		exp = 0;
 		decimal = str;
 	}
-
-	// 再保留小数
-	if ((decimal[pf.decimal_point + 3] - '0') >= 5)
+	if (pf.significant_digits == 0)
 	{
-
+		// 默认保留6位有效数字
+		pf.significant_digits = 6;
+	}
+	// 先提取要计算的部分
+	string tmp = decimal.substr(0, 1) + decimal.substr(2, pf.significant_digits);
+	cout << tmp << "\n";
+	// 四舍六入五成双
+	int last_digit = tmp.back() - '0';
+	int penultimate_digit = tmp[tmp.size() - 2] - '0';
+	if (last_digit < 4 || (last_digit == 5 && penultimate_digit % 2 == 0))
+	{
+		tmp.pop_back();
 	}
 	else
 	{
-		decimal = decimal.substr(0, pf.decimal_point + 2);
+		tmp.pop_back();
+		res = (BigDecimal(tmp) + BigDecimal("1")).number;
+		if (res.size() > pf.significant_digits)
+		{
+			res.pop_back();
+		}
 	}
-
-	return "";
+	res = tmp.substr(0, 1) + "." + tmp.substr(1);
+	return res;
 }
