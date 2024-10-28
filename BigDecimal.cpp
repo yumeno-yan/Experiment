@@ -5,12 +5,12 @@ print_format pf = { 6,2 };
 string BigDecimal::add(const string& other)
 {
 	string ans;
-	// µ¹Ğò±éÀú
-	// i´Óµ±Ç°ÊıµÄ¸öÎ»¿ªÊ¼£¬j´ÓotherµÄ¸öÎ»¿ªÊ¼£¬add±íÊ¾½øÎ»
+	// å€’åºéå†
+	// iä»å½“å‰æ•°çš„ä¸ªä½å¼€å§‹ï¼Œjä»otherçš„ä¸ªä½å¼€å§‹ï¼Œaddè¡¨ç¤ºè¿›ä½
 	int i = this->number.length() - 1, j = other.length() - 1, add = 0;
 	while (i >= 0 || j >= 0 || add != 0)
 	{
-		// >=0±íÊ¾»¹ÓĞÊıÃ»ÓĞ´¦ÀíÍê£¬<0 ±íÊ¾ÒÑ¾­´¦ÀíÍêËùÓĞÊı£¬Ö±½ÓÖÃÎª0
+		// >=0è¡¨ç¤ºè¿˜æœ‰æ•°æ²¡æœ‰å¤„ç†å®Œï¼Œ<0 è¡¨ç¤ºå·²ç»å¤„ç†å®Œæ‰€æœ‰æ•°ï¼Œç›´æ¥ç½®ä¸º0
 		int x = i >= 0 ? this->number[i] - '0' : 0;
 		int y = j >= 0 ? other[j] - '0' : 0;
 		int result = x + y + add;
@@ -19,7 +19,7 @@ string BigDecimal::add(const string& other)
 		i--;
 		j--;
 	}
-	// ¼ÆËãÍêÒÔºóµÄ´ğ°¸ĞèÒª·­×ª¹ıÀ´
+	// è®¡ç®—å®Œä»¥åçš„ç­”æ¡ˆéœ€è¦ç¿»è½¬è¿‡æ¥
 	std::reverse(ans.begin(), ans.end());
 	return ans;
 }
@@ -36,9 +36,9 @@ BigDecimal BigDecimal::operator+(const BigDecimal& other)
 
 string BigDecimal::subtract(const string& other)
 {
-	// ÏÈ±È½Ï´óĞ¡£¬ÈÃ´óµÄ¼õĞ¡µÄ
+	// å…ˆæ¯”è¾ƒå¤§å°ï¼Œè®©å¤§çš„å‡å°çš„
 	string num_a, num_b;
-	// ¼ÇÂ¼¸ººÅ
+	// è®°å½•è´Ÿå·
 	bool minus = false;
 	switch (compare(this->number, other))
 	{
@@ -55,12 +55,12 @@ string BigDecimal::subtract(const string& other)
 		return "0";
 	}
 	string ans;
-	// µ¹Ğò±éÀú
-	// i´Óµ±Ç°ÊıµÄ¸öÎ»¿ªÊ¼£¬j´Ónum_bµÄ¸öÎ»¿ªÊ¼£¬borrow±íÊ¾½èÎ»
+	// å€’åºéå†
+	// iä»å½“å‰æ•°çš„ä¸ªä½å¼€å§‹ï¼Œjä»num_bçš„ä¸ªä½å¼€å§‹ï¼Œborrowè¡¨ç¤ºå€Ÿä½
 	int i = num_a.length() - 1, j = num_b.length() - 1, borrow = 0;
 	while (i >= 0)
 	{
-		// >=0±íÊ¾»¹ÓĞÊıÃ»ÓĞ´¦ÀíÍê£¬<0 ±íÊ¾ÒÑ¾­´¦ÀíÍêËùÓĞÊı£¬Ö±½ÓÖÃÎª0
+		// >=0è¡¨ç¤ºè¿˜æœ‰æ•°æ²¡æœ‰å¤„ç†å®Œï¼Œ<0 è¡¨ç¤ºå·²ç»å¤„ç†å®Œæ‰€æœ‰æ•°ï¼Œç›´æ¥ç½®ä¸º0
 		int x = num_a[i] - '0';
 		int y = j >= 0 ? num_b[j] - '0' : 0;
 		int result = x - y - borrow;
@@ -69,7 +69,7 @@ string BigDecimal::subtract(const string& other)
 		i--;
 		j--;
 	}
-	// È¥³ıÇ°µ¼0
+	// å»é™¤å‰å¯¼0
 	while (ans.size() > 0 && ans.back() == '0')
 	{
 		ans.pop_back();
@@ -78,7 +78,7 @@ string BigDecimal::subtract(const string& other)
 	{
 		ans += "-";
 	}
-	// ¼ÆËãÍêÒÔºóµÄ´ğ°¸ĞèÒª·­×ª¹ıÀ´
+	// è®¡ç®—å®Œä»¥åçš„ç­”æ¡ˆéœ€è¦ç¿»è½¬è¿‡æ¥
 	std::reverse(ans.begin(), ans.end());
 	return ans;
 }
@@ -95,7 +95,7 @@ BigDecimal BigDecimal::operator-(const BigDecimal& other)
 
 string BigDecimal::multiply(const string& other)
 {
-	// ±È½Ï´óĞ¡£¬ÈÃ´óµÄ³ËÒÔĞ¡µÄ
+	// æ¯”è¾ƒå¤§å°ï¼Œè®©å¤§çš„ä¹˜ä»¥å°çš„
 	string num_a, num_b;
 	switch (compare(this->number, other))
 	{
@@ -111,16 +111,16 @@ string BigDecimal::multiply(const string& other)
 	default:
 		break;;
 	}
-	// ±éÀú½ÏĞ¡ÊıµÄÃ¿Ò»Î»£¬Ê¹ÆäÓë½Ï´óÊıÏà³Ë£¬¼ÇÂ¼½á¹û²¢Ïà¼Ó
+	// éå†è¾ƒå°æ•°çš„æ¯ä¸€ä½ï¼Œä½¿å…¶ä¸è¾ƒå¤§æ•°ç›¸ä¹˜ï¼Œè®°å½•ç»“æœå¹¶ç›¸åŠ 
 	BigDecimal add_res("0"), mul_res("");
-	// ÓÃÓÚ´æ´¢Ã¿Ò»´ÎµÄ»ı£¬Êä³öÓÃ
+	// ç”¨äºå­˜å‚¨æ¯ä¸€æ¬¡çš„ç§¯ï¼Œè¾“å‡ºç”¨
 	vector<string> mul_res_arr;
 	for (int i = num_b.size() - 1;i >= 0;i--)
 	{
-		// ÏÈ¼ÇÂ¼Ã¿Ò»´Î³Ë·¨µÄ½á¹û
+		// å…ˆè®°å½•æ¯ä¸€æ¬¡ä¹˜æ³•çš„ç»“æœ
 		mul_res = BigDecimal(num_a).multiply_single(num_b[i], num_b.size() - i - 1);
 		mul_res_arr.emplace_back(mul_res.number);
-		// ³Ë·¨½á¹ûÓëµ±Ç°µÄ¼Ó·¨½á¹ûÏà¼Ó
+		// ä¹˜æ³•ç»“æœä¸å½“å‰çš„åŠ æ³•ç»“æœç›¸åŠ 
 		add_res = mul_res + add_res;
 	}
 	multiply_print(num_a, num_b, add_res.number, mul_res_arr, "");
@@ -140,17 +140,17 @@ BigDecimal BigDecimal::operator*(const BigDecimal& other)
 string BigDecimal::divide(const string& other)
 {
 	string str = this->number;
-	// ÏÈ½«Æä²¹µ½ÏàÍ¬Î»Êı
+	// å…ˆå°†å…¶è¡¥åˆ°ç›¸åŒä½æ•°
 	int point = other.size() > str.size() ? other.size() - str.size() : 0;
 	for (int i = 0;i < point;i++)
 	{
 		str += "0";
 	}
 	string ans;
-	// ¼ÆËãÒªËãµÄÎ»Êı£ºÕûÊı²¿·Ö+±£ÁôĞ¡ÊıµãÎ»Êı+²¹0µÄ¸öÊı
-	// ÕâÀï¼ÓÉÏ²¹0¸öÊıÊÇÎªÁË×ªÎª¿ÆÑ§¼ÆÊı·¨·½·¨Ê±·ÀÖ¹Î»Êı²»¹»
+	// è®¡ç®—è¦ç®—çš„ä½æ•°ï¼šæ•´æ•°éƒ¨åˆ†+ä¿ç•™å°æ•°ç‚¹ä½æ•°+è¡¥0çš„ä¸ªæ•°
+	// è¿™é‡ŒåŠ ä¸Šè¡¥0ä¸ªæ•°æ˜¯ä¸ºäº†è½¬ä¸ºç§‘å­¦è®¡æ•°æ³•æ–¹æ³•æ—¶é˜²æ­¢ä½æ•°ä¸å¤Ÿ
 	int digit_number = str.size() - other.size() + 2 + pf.decimal_point + point;
-	// ÓàÊı
+	// ä½™æ•°
 	string remainder = str.substr(0, other.size());
 	int k = other.size() - 1;
 	for (int i = 0;i <= digit_number;i++)
@@ -158,7 +158,7 @@ string BigDecimal::divide(const string& other)
 		bool find = false;
 		for (int j = 1;j <= 10;j++)
 		{
-			if (j != 10)	// j==10µÄÊ±ºòËµÃ÷jÒ»¶¨Îª9
+			if (j != 10)	// j==10çš„æ—¶å€™è¯´æ˜jä¸€å®šä¸º9
 			{
 				string tmp = BigDecimal(other).multiply_single((char)(j + '0'), 0);
 				switch (compare(remainder, tmp))
@@ -193,16 +193,16 @@ string BigDecimal::divide(const string& other)
 			}
 		}
 	}
-	// ÏÈ²¹ÉÏÈ±Ê§µÄ0
-	// string²»¿ÉÒÔÖ±½ÓÔÚÍ·ÔªËØ²åÈë£¬ËùÒÔÏÈ·­×ª
+	// å…ˆè¡¥ä¸Šç¼ºå¤±çš„0
+	// stringä¸å¯ä»¥ç›´æ¥åœ¨å¤´å…ƒç´ æ’å…¥ï¼Œæ‰€ä»¥å…ˆç¿»è½¬
 	std::reverse(ans.begin(), ans.end());
 	for (int i = 0;i < point;i++)
 	{
 		ans += '0';
 	}
-	// ÔÙ·­×ª»ØÀ´
+	// å†ç¿»è½¬å›æ¥
 	std::reverse(ans.begin(), ans.end());
-	// ÔÙ²¹ÉÏĞ¡ÊıµãµÄÎ»ÖÃ
+	// å†è¡¥ä¸Šå°æ•°ç‚¹çš„ä½ç½®
 	int pos = str.size() - other.size() + 1;
 	ans = ans.substr(0, pos) + "." + ans.substr(pos);
 	return ans;
@@ -219,32 +219,32 @@ BigDecimal BigDecimal::operator/(const BigDecimal& other)
 }
 
 /**
- * @brief ¼ì²éÊäÈëµÄ±í´ïÊ½ÊÇ·ñºÏ·¨
- * @param experssion ´ı¼ì²éµÄ±í´ïÊ½
- * @return true-¼ì²éÍ¨¹ı false-¼ì²é²»Í¨¹ı
+ * @brief æ£€æŸ¥è¾“å…¥çš„è¡¨è¾¾å¼æ˜¯å¦åˆæ³•
+ * @param experssion å¾…æ£€æŸ¥çš„è¡¨è¾¾å¼
+ * @return true-æ£€æŸ¥é€šè¿‡ false-æ£€æŸ¥ä¸é€šè¿‡
  */
 bool BigDecimal::check_expression(const string& experssion)
 {
-	// µÚÒ»²½¸ù¾İÔËËã·û½«±í´ïÊ½·Ö¸îÎªnum1 operator num2Èı²¿·Ö
+	// ç¬¬ä¸€æ­¥æ ¹æ®è¿ç®—ç¬¦å°†è¡¨è¾¾å¼åˆ†å‰²ä¸ºnum1 operator num2ä¸‰éƒ¨åˆ†
 	auto index = experssion.find_first_of("+-*/");
-	// Ã»ÕÒµ½¾Í·µ»Øfalse
+	// æ²¡æ‰¾åˆ°å°±è¿”å›false
 	if (index == string::npos)
 	{
 		return false;
 	}
 	string num1 = experssion.substr(0, index);
 	string num2 = experssion.substr(index + 1);
-	// È¥³ıÍ·Î²µÄ¿Õ¸ñ
+	// å»é™¤å¤´å°¾çš„ç©ºæ ¼
 	trim(num1), trim(num2);
-	// ÕÒµ½µÚÒ»¸ö²»ÎªÊı×ÖµÄ×Ö·ûÎ»ÖÃ
+	// æ‰¾åˆ°ç¬¬ä¸€ä¸ªä¸ä¸ºæ•°å­—çš„å­—ç¬¦ä½ç½®
 	index = num1.find_first_not_of("0123456789");
-	// index²»±íÊ¾²»´æÔÚÔòËµÃ÷num1ÓĞÎÊÌâ
+	// indexä¸è¡¨ç¤ºä¸å­˜åœ¨åˆ™è¯´æ˜num1æœ‰é—®é¢˜
 	if (index != string::npos)
 	{
 		return false;
 	}
 	index = num2.find_first_not_of("0123456789");
-	// Í¬ÉÏ
+	// åŒä¸Š
 	if (index != string::npos)
 	{
 		return false;
@@ -253,9 +253,9 @@ bool BigDecimal::check_expression(const string& experssion)
 }
 
 /**
- * @brief ¼ÆËãµ±Ç°Êı³ËÒÔµ¥¸öÊıµÄ½á¹û£¬²¢ÔÚ½áÎ²²¹0
- * @param single ´«ÈëµÄ×Ö·û
- * @param i ĞèÒª²¹³äµÄ0µÄ¸öÊı
+ * @brief è®¡ç®—å½“å‰æ•°ä¹˜ä»¥å•ä¸ªæ•°çš„ç»“æœï¼Œå¹¶åœ¨ç»“å°¾è¡¥0
+ * @param single ä¼ å…¥çš„å­—ç¬¦
+ * @param i éœ€è¦è¡¥å……çš„0çš„ä¸ªæ•°
  */
 string BigDecimal::multiply_single(const char& single, int zero_num = 0)
 {
@@ -280,10 +280,10 @@ string BigDecimal::multiply_single(const char& single, int zero_num = 0)
 	return ans;
 }
 
-// ±È½Ïstr1ºÍstr2µÄ´óĞ¡£¬str1´ó·µ»Ø1£¬ÏàµÈ·µ»Ø0£¬str2·µ»Ø-1
+// æ¯”è¾ƒstr1å’Œstr2çš„å¤§å°ï¼Œstr1å¤§è¿”å›1ï¼Œç›¸ç­‰è¿”å›0ï¼Œstr2è¿”å›-1
 int BigDecimal::compare(const string& str1, const string& str2)
 {
-	// Î»Êı¸ü¶àµÄÒ»¶¨¸ü´ó
+	// ä½æ•°æ›´å¤šçš„ä¸€å®šæ›´å¤§
 	if (str1.size() > str2.size())
 	{
 		return 1;
@@ -302,48 +302,48 @@ int BigDecimal::compare(const string& str1, const string& str2)
 }
 
 /**
- * @brief ½«´«ÈëµÄ×Ö·û´®È¥µôÍ·Î²µÄ¿Õ¸ñ
- * @param str ´«ÈëµÄ×Ö·û´®
+ * @brief å°†ä¼ å…¥çš„å­—ç¬¦ä¸²å»æ‰å¤´å°¾çš„ç©ºæ ¼
+ * @param str ä¼ å…¥çš„å­—ç¬¦ä¸²
  */
 void BigDecimal::trim(string& str)
 {
-	// ÕÒµ½µÚÒ»¸öºÍ×îºóÒ»¸ö²»Îª¿Õ¸ñµÄÎ»ÖÃ
+	// æ‰¾åˆ°ç¬¬ä¸€ä¸ªå’Œæœ€åä¸€ä¸ªä¸ä¸ºç©ºæ ¼çš„ä½ç½®
 	auto first = str.find_first_not_of(" ");
 	auto last = str.find_last_not_of(" ");
-	// strÌæ»»ÎªfirstºÍlastÖ®¼äµÄÎ»ÖÃ
+	// stræ›¿æ¢ä¸ºfirstå’Œlastä¹‹é—´çš„ä½ç½®
 	str = str.substr(first, last - first + 1);
 }
 
 /**
- * @brief ÓÃÓÚ³Ë·¨ÖĞµÄËãÊ½Êä³ö
- * @param num1 ³ËÊı
- * @param num2 ±»³ËÊı
- * @param res Ïà³ËµÄ½á¹û
- * @param arr ³Ë·¨¹ı³ÌÖĞÃ¿Ò»Î»µÄ»ı
- * @param file_path Êä³öµ½ÎÄ¼şµÄÂ·¾¶
+ * @brief ç”¨äºä¹˜æ³•ä¸­çš„ç®—å¼è¾“å‡º
+ * @param num1 ä¹˜æ•°
+ * @param num2 è¢«ä¹˜æ•°
+ * @param res ç›¸ä¹˜çš„ç»“æœ
+ * @param arr ä¹˜æ³•è¿‡ç¨‹ä¸­æ¯ä¸€ä½çš„ç§¯
+ * @param file_path è¾“å‡ºåˆ°æ–‡ä»¶çš„è·¯å¾„
  */
 void BigDecimal::multiply_print(const string& num1, const string& num2, const string& res, const vector<string>& arr, const string& file_path)
 {
-	// Êä³öµÚÒ»ĞĞ³ËÊı
+	// è¾“å‡ºç¬¬ä¸€è¡Œä¹˜æ•°
 	for (int i = 0;i < res.size() - num1.size();i++)
 	{
 		cout << " ";
 	}
 	cout << num1 << "\n";
-	// Êä³öµÚ¶şĞĞ³ËÊı
+	// è¾“å‡ºç¬¬äºŒè¡Œä¹˜æ•°
 	cout << "x";
 	for (int i = 0;i < res.size() - num2.size() - 1;i++)
 	{
 		cout << " ";
 	}
 	cout << num2 << "\n";
-	// Êä³öÖĞ¼äµÄÏß
+	// è¾“å‡ºä¸­é—´çš„çº¿
 	for (int i = 0;i < res.size();i++)
 	{
 		cout << "-";
 	}
 	cout << "\n";
-	// Êä³öÃ¿¸öÖĞ¼äµÄ»ı
+	// è¾“å‡ºæ¯ä¸ªä¸­é—´çš„ç§¯
 	for (int i = 0;i < arr.size();i++)
 	{
 		for (int j = 0;j < res.size() - arr[i].size();j++)
@@ -352,42 +352,42 @@ void BigDecimal::multiply_print(const string& num1, const string& num2, const st
 		}
 		cout << arr[i].substr(0, arr[i].size() - i) << "\n";
 	}
-	// ³ËÒÔ¸öÎ»ÊıµÄ»°Ö±½Ó·µ»Ø
+	// ä¹˜ä»¥ä¸ªä½æ•°çš„è¯ç›´æ¥è¿”å›
 	if (arr.size() == 1)
 	{
 		return;
 	}
-	// Êä³öÖĞ¼äµÄÏß
+	// è¾“å‡ºä¸­é—´çš„çº¿
 	for (int i = 0;i < res.size();i++)
 	{
 		cout << "-";
 	}
 	cout << "\n";
-	// Êä³ö×îºóµÄ»ı
+	// è¾“å‡ºæœ€åçš„ç§¯
 	cout << res << "\n";
 }
 
 string BigDecimal::format_string(const string& str)
 {
 	string res;
-	// ÏÈ×ªÎª¿ÆÑ§¼ÆÊı·¨£¬decimal±íÊ¾ÊµÊı²¿·Ö£¬exp±íÊ¾Ö¸Êı²¿·Ö
+	// å…ˆè½¬ä¸ºç§‘å­¦è®¡æ•°æ³•ï¼Œdecimalè¡¨ç¤ºå®æ•°éƒ¨åˆ†ï¼Œexpè¡¨ç¤ºæŒ‡æ•°éƒ¨åˆ†
 	string decimal;
 	int exp = 0;
-	// ÏÈÕÒµ½Ğ¡ÊıµãµÄÎ»ÖÃ
+	// å…ˆæ‰¾åˆ°å°æ•°ç‚¹çš„ä½ç½®
 	auto position = str.find_first_of(".");
-	// Èç¹ûÒªÊ¹ÓÃ¿ÆÑ§¼ÆÊı·¨
+	// å¦‚æœè¦ä½¿ç”¨ç§‘å­¦è®¡æ•°æ³•
 	if (pf.scientific_notation != 0)
 	{
-		// Èç¹ûÊÇ´óÊı£¬ĞÎÈç1234.5678
+		// å¦‚æœæ˜¯å¤§æ•°ï¼Œå½¢å¦‚1234.5678
 		if (position != 1)
 		{
 			exp += position - 1;
-			// ½«1234.5678·ÖÎª1 . 234 5678ËÄ¸ö²¿·Ö
+			// å°†1234.5678åˆ†ä¸º1 . 234 5678å››ä¸ªéƒ¨åˆ†
 			decimal = str.substr(0, 1) + "." + str.substr(1, position - 1) + str.substr(position + 1);
 		}
-		else if (str[0] == '0')	// Èç¹ûÊÇ½ÏĞ¡Êı£¬ĞÎÈç0.000123456
+		else if (str[0] == '0')	// å¦‚æœæ˜¯è¾ƒå°æ•°ï¼Œå½¢å¦‚0.000123456
 		{
-			// ÕÒµ½µÚÒ»¸ö·Ç0µÄÎ»ÖÃ
+			// æ‰¾åˆ°ç¬¬ä¸€ä¸ªé0çš„ä½ç½®
 			auto non_zero_position = str.find_first_not_of("0.");
 			exp -= non_zero_position - position;
 			decimal = str.substr(non_zero_position, 1) + "." + str.substr(non_zero_position + 1);
@@ -404,7 +404,7 @@ string BigDecimal::format_string(const string& str)
 		decimal = str;
 	}
 
-	// ÔÙ±£ÁôĞ¡Êı
+	// å†ä¿ç•™å°æ•°
 	if ((decimal[pf.decimal_point + 3] - '0') >= 5)
 	{
 
