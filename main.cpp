@@ -10,9 +10,12 @@ int main()
 	//	cout << s.score << " ";
 	//}
 	//cout << "\n";
-	BigDecimal a("114514141414");
-	BigDecimal b("1919810");
-	auto ans = a - b;
-	ans.show();
+	BigDecimal a("333");
+	BigDecimal b("1");
+	// pf.decimal_point = 5;
+	// auto ans = a / b;
+	// ans.show();
+	string str = "1.114514";
+	BigDecimal::format_string(str);
 	return 0;
 }
