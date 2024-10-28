@@ -9,7 +9,7 @@ struct Student
 {
 	string name;
 	string id;
-	double score;	// ³É¼¨Îª0.5µÄ±¶Êı
+	double score;	// æˆç»©ä¸º0.5çš„å€æ•°
 
 	Student() = default;
 	Student(double s) :score(s) {}
@@ -17,40 +17,47 @@ struct Student
 	Student(const Student& other) :name(other.name), id(other.id), score(other.score) {}
 };
 
+/*
+* å…³äºtop_né—®é¢˜ç»¼åˆè€ƒè™‘æœ€å¥½çš„æ–¹æ³•æ˜¯å †æ’åºï¼Œå³åˆ›å»ºä¸€ä¸ªæœ‰nä¸ªå…ƒç´ çš„æœ€å°å †ï¼Œéå†åºåˆ—å°†æ¯ä¸ªå…ƒç´ ä¸å †é¡¶å…ƒç´ æ¯”è¾ƒï¼Œ
+* å¦‚æœå †é¡¶å…ƒç´ å°ä¸åºåˆ—ä¸­çš„å…ƒç´ ï¼Œå°±ç”¨åºåˆ—å…ƒç´ æ›¿æ¢å †é¡¶å…ƒç´ ï¼Œå†è°ƒæ•´å †ã€‚è¿™ç§æ–¹æ³•çš„æ—¶é—´å¤æ‚åº¦ä¸ºO(nlogm)ï¼Œnä¸ºåºåˆ—å…ƒç´ ä¸ªæ•°ï¼Œmä¸ºå †çš„å¤§å°
+* 
+* ä½†æ˜¯è€ƒè™‘åˆ°è¿™é¢˜éœ€è¦å°½å¯èƒ½åœ°å¿«ï¼Œåœ¨ä¼˜å…ˆè€ƒè™‘é€Ÿåº¦çš„æƒ…å†µä¸‹ä½¿ç”¨æ¡¶æ’åºï¼Œè¿™æ ·ä¼šç‰ºç‰²ä¸€äº›ç©ºé—´ä½†æ˜¯æ—¶é—´å¤æ‚åº¦é™ä½åˆ°O(n)ã€‚
+*/
+
 /**
- * @param students ÒªÅÅĞòµÄÑ§ÉúÊı¾İ
- * @param n Ñ¡È¡Ç°n¸ö
- * @return ÅÅĞòµÄ½á¹û
+ * @param students è¦æ’åºçš„å­¦ç”Ÿæ•°æ®
+ * @param n é€‰å–å‰nä¸ª
+ * @return æ’åºçš„ç»“æœ
  */
 vector<Student> top_n(vector<Student>& students, int n)
 {
-	// ÏÈÕÒµ½×î´óÖµºÍ×îĞ¡Öµ
+	// å…ˆæ‰¾åˆ°æœ€å¤§å€¼å’Œæœ€å°å€¼
 	double max_score = -9999.0, min_score = 9999.0;
 	for (const auto& student : students)
 	{
 		max_score = max(max_score, student.score);
 		min_score = min(min_score, student.score);
 	}
-	// ¸ù¾İ¶şÕßµÄ²îÀ´´´½¨Êı×é£¬³É¼¨Îª0.5µÄ±¶ÊıËùÒÔ´´½¨µÄÈİÁ¿´óĞ¡Îª²îµÄË«±¶£¬1~2Ö®¼äÓĞ1.0 1.5 2.0Èı¸öÊı£¬ËùÒÔ½á¹ûÔÙ¼Ó1
+	// æ ¹æ®äºŒè€…çš„å·®æ¥åˆ›å»ºæ•°ç»„ï¼Œæˆç»©ä¸º0.5çš„å€æ•°æ‰€ä»¥åˆ›å»ºçš„å®¹é‡å¤§å°ä¸ºå·®çš„åŒå€ï¼Œ1~2ä¹‹é—´æœ‰1.0 1.5 2.0ä¸‰ä¸ªæ•°ï¼Œæ‰€ä»¥ç»“æœå†åŠ 1
 	vector<vector<Student>> arr((int)((max_score - min_score) * 2 + 1), vector<Student>{});
-	// ±éÀústudents£¬½«Ã¿¸östudent°´ÕÕ³É¼¨´æ´¢µ½¶ÔÓ¦ÏÂ±êÖĞ
+	// éå†studentsï¼Œå°†æ¯ä¸ªstudentæŒ‰ç…§æˆç»©å­˜å‚¨åˆ°å¯¹åº”ä¸‹æ ‡ä¸­
 	for (const auto& student : students)
 	{
 		arr[(int)((student.score - min_score) * 2)].emplace_back(student);
 	}
-	// ans´æ·Å½á¹û
+	// anså­˜æ”¾ç»“æœ
 	vector<Student> ans;
-	// µ¹Ğò±éÀú£¬ÕÒÇ°n¸ö·ûºÏÌõ¼şµÄ
+	// å€’åºéå†ï¼Œæ‰¾å‰nä¸ªç¬¦åˆæ¡ä»¶çš„
 	int k = arr.size() - 1;
 	while (true)
 	{
-		// Èç¹ûµ±Ç°µÄarr´æ·ÅµÄ³É¼¨ÊıÁ¿´óÓÚ0£¬Ôò±éÀúarr[k]£¬½«ÆäÖĞËùÓĞµÄstudent·Åµ½½á¹ûÖĞ
+		// å¦‚æœå½“å‰çš„arrå­˜æ”¾çš„æˆç»©æ•°é‡å¤§äº0ï¼Œåˆ™éå†arr[k]ï¼Œå°†å…¶ä¸­æ‰€æœ‰çš„studentæ”¾åˆ°ç»“æœä¸­
 		if (arr[k].size() > 0)
 		{
 			for (auto& stu : arr[k])
 			{
 				ans.emplace_back(stu);
-				// ÈôansµÄÊıÁ¿ÒÑ¾­Îªn£¬ÔòÖ±½Ó·µ»Ø
+				// è‹¥ansçš„æ•°é‡å·²ç»ä¸ºnï¼Œåˆ™ç›´æ¥è¿”å›
 				if (ans.size() == n)
 				{
 					return ans;
