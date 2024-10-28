@@ -149,7 +149,7 @@ string BigDecimal::divide(const string& other)
 	string ans;
 	// 计算要算的位数：整数部分+保留小数点位数+补0的个数
 	// 这里加上补0个数是为了转为科学计数法方法时防止位数不够
-	int digit_number = str.size() - other.size() + 1 + pf.decimal_point + point;
+	int digit_number = str.size() - other.size() + 2 + pf.decimal_point + point;
 	// 余数
 	string remainder = str.substr(0, other.size());
 	int k = other.size() - 1;
@@ -375,14 +375,44 @@ string BigDecimal::format_string(const string& str)
 	int exp = 0;
 	// 先找到小数点的位置
 	auto position = str.find_first_of(".");
-	// 如果是大数，形如1234.5678
-	if (position != 1)
+	// 如果要使用科学计数法
+	if (pf.scientific_notation != 0)
 	{
-		exp += position - 1;
-		// 将1234.5678分为1 . 234 5678四个部分
-		decimal = str.substr(0, 1) + "." + str.substr(1, position - 1) + str.substr(position + 1);
+		// 如果是大数，形如1234.5678
+		if (position != 1)
+		{
+			exp += position - 1;
+			// 将1234.5678分为1 . 234 5678四个部分
+			decimal = str.substr(0, 1) + "." + str.substr(1, position - 1) + str.substr(position + 1);
+		}
+		else if (str[0] == '0')	// 如果是较小数，形如0.000123456
+		{
+			// 找到第一个非0的位置
+			auto non_zero_position = str.find_first_not_of("0.");
+			exp -= non_zero_position - position;
+			decimal = str.substr(non_zero_position, 1) + "." + str.substr(non_zero_position + 1);
+		}
+		else	// 1.114514
+		{
+			exp = 0;
+			decimal = str;
+		}
 	}
-	cout << exp << "\n";
-	cout << decimal << "\n";
+	else
+	{
+		exp = 0;
+		decimal = str;
+	}
+
+	// 再保留小数
+	if ((decimal[pf.decimal_point + 3] - '0') >= 5)
+	{
+
+	}
+	else
+	{
+		decimal = decimal.substr(0, pf.decimal_point + 2);
+	}
+
 	return "";
 }

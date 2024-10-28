@@ -15,7 +15,7 @@ int main()
 	// pf.decimal_point = 5;
 	// auto ans = a / b;
 	// ans.show();
-	string str = "1234.5678";
+	string str = "1.114514";
 	BigDecimal::format_string(str);
 	return 0;
 }
