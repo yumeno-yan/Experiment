@@ -6,6 +6,7 @@
 # cmake
 build
 CMakeLists.txt
+.vscode
 
 # User-specific files
 *.rsuser
