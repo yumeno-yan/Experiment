@@ -12,6 +12,7 @@ using namespace std;
 struct print_format
 {
 	int significant_digits; // 是否采用科学计数法，-1-不采用，0-自动，n-保留n位有效数字
+	string dir_path;	// 输出的路径，文件名会自动填充
 };
 
 extern print_format pf;

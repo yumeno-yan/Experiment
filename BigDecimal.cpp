@@ -1,4 +1,5 @@
 #include "BigDecimal.h"
+#include "io_handler.h"
 
 print_format pf = { 4 };
 
@@ -204,7 +205,7 @@ string BigDecimal::divide(const string& other)
 		}
 	}
 	// 输出对应的算式
-	// divide_print(ans, str, other, remainder_arr, tmp_arr);
+	divide_print(ans, str, other, remainder_arr, tmp_arr);
 	// 先补上缺失的0
 	// string不可以直接在头元素插入，所以先翻转
 	std::reverse(ans.begin(), ans.end());
@@ -354,30 +355,30 @@ void BigDecimal::multiply_print(const string& num1, const string& num2, const st
 	// 输出第一行乘数
 	for (int i = 0; i < res.size() - num1.size(); i++)
 	{
-		cout << " ";
+		coh << " ";
 	}
-	cout << num1 << "\n";
+	coh << num1 << "\n";
 	// 输出第二行乘数
-	cout << "x";
+	coh << "x";
 	for (int i = 0; i < res.size() - num2.size() - 1; i++)
 	{
-		cout << " ";
+		coh << " ";
 	}
-	cout << num2 << "\n";
+	coh << num2 << "\n";
 	// 输出中间的线
 	for (int i = 0; i < res.size(); i++)
 	{
-		cout << "-";
+		coh << "-";
 	}
-	cout << "\n";
+	coh << "\n";
 	// 输出每个中间的积
 	for (int i = 0; i < arr.size(); i++)
 	{
 		for (int j = 0; j < res.size() - arr[i].size(); j++)
 		{
-			cout << " ";
+			coh << " ";
 		}
-		cout << arr[i].substr(0, arr[i].size() - i) << "\n";
+		coh << arr[i].substr(0, arr[i].size() - i) << "\n";
 	}
 	// 乘以个位数的话直接返回
 	if (arr.size() == 1)
@@ -387,11 +388,11 @@ void BigDecimal::multiply_print(const string& num1, const string& num2, const st
 	// 输出中间的线
 	for (int i = 0; i < res.size(); i++)
 	{
-		cout << "-";
+		coh << "-";
 	}
-	cout << "\n";
+	coh << "\n";
 	// 输出最后的积
-	cout << res << "\n";
+	coh << res << "\n";
 }
 
 /**
@@ -404,18 +405,19 @@ void BigDecimal::multiply_print(const string& num1, const string& num2, const st
 */
 void BigDecimal::divide_print(const string& res, const string& dividend, const string& divisor, const vector<string>& remainder_arr, const vector<string>& tmp_arr)
 {
-	// 输出上方的东西
+	coh.init("/home/jieyan/Experiment");
+	// 输出除数，被除数，商
 	do
 	{
 		for (int i = 0;i < divisor.size() * 2;i++)
-			cout << " ";
-		cout << res << "\n";
+			coh << " ";
+		coh << res << "\n";
 		for (int i = 0;i < divisor.size();i++)
-			cout << " ";
+			coh << " ";
 		for (int i = 0;i < divisor.size() + res.size();i++)
-			cout << "—";
-		cout << "\n";
-		cout << divisor << ")" << dividend << "\n";
+			coh << "—";
+		coh << "\n";
+		coh << divisor << ")" << dividend << "\n";
 	} while (0);
 
 	// align控制末位对齐
@@ -423,17 +425,17 @@ void BigDecimal::divide_print(const string& res, const string& dividend, const s
 	for (int i = 0;i < res.size() - 1;i++)
 	{
 		for (int j = 0;j < align - tmp_arr[i].size();j++)
-			cout << " ";
-		cout << tmp_arr[i] << "\n";
+			coh << " ";
+		coh << tmp_arr[i] << "\n";
 		for (int j = 0;j < align - tmp_arr[i].size() - 1;j++)
-			cout << " ";
+			coh << " ";
 		for (int j = 0;j < tmp_arr[i].size() + 3;j++)
-			cout << "—";
-		cout << "\n";
+			coh << "—";
+		coh << "\n";
 		align++;
 		for (int j = 0;j < align - remainder_arr[i].size();j++)
-			cout << " ";
-		cout << remainder_arr[i] << "\n";
+			coh << " ";
+		coh << remainder_arr[i] << "\n";
 	}
 }
 
@@ -445,7 +447,6 @@ void BigDecimal::divide_print(const string& res, const string& dividend, const s
  */
 string BigDecimal::format_string(const string& str)
 {
-	cout << "str: " << str << "\n";
 	string res;
 	// 科学计数法，decimal表示实数部分，exp表示指数部分
 	string decimal;

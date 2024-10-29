@@ -45,7 +45,7 @@ int Co_handler::init(const string& path)
     split = "/";
 #endif
     ss << path << "/"
-        << std::put_time(std::localtime(&now_c), "%Y-%m-%d#%H:%M:%S")
+        << std::put_time(std::localtime(&now_c), "%Y-%m-%d_%H:%M:%S")
         << ".txt";
     string file_name(ss.str());
     this->fout.open(file_name);
