@@ -10,12 +10,13 @@ int main()
 	//	cout << s.score << " ";
 	//}
 	//cout << "\n";
-	BigDecimal a("9999");
+	pf.significant_digits = 4;
+	BigDecimal a("0");
 	BigDecimal b("1");
-	// auto ans = a / b;
-	// ans.show();
-	pf.significant_digits = 5;
-	string str = "1.123456";
-	cout << BigDecimal::format_string(str) << "\n";
+	auto ans = a / b;
+	ans.show();
+	// pf.significant_digits = 5;
+	// string str = "1.123456";
+	// cout << BigDecimal::format_string(str) << "\n";
 	return 0;
 }

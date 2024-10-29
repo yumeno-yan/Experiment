@@ -139,7 +139,17 @@ BigDecimal BigDecimal::operator*(const BigDecimal& other)
 
 string BigDecimal::divide(const string& other)
 {
+	if (compare(other, "0") == 0)
+	{
+		return "NaN";
+	}
+	if (compare(this->number, "0") == 0)
+	{
+		return "0";
+	}
 	string str = this->number;
+	// 记录每次的余数和过程中的积，用于输出算式
+	vector<string> remainder_arr, tmp_arr;
 	// 先将其补到相同位数
 	int point = other.size() > str.size() ? other.size() - str.size() : 0;
 	for (int i = 0; i < point; i++)
@@ -168,8 +178,6 @@ string BigDecimal::divide(const string& other)
 				case -1:
 					find = true;
 					break;
-				case 1:
-					break;
 				default:
 					break;
 				}
@@ -182,6 +190,7 @@ string BigDecimal::divide(const string& other)
 			{
 				char x = j - 1 + '0';
 				string tmp = BigDecimal(other).multiply_single(x, 0);
+				tmp_arr.emplace_back(tmp);
 				ans += x;
 				remainder = BigDecimal(remainder).subtract(tmp);
 				if (remainder == "0")
@@ -189,10 +198,13 @@ string BigDecimal::divide(const string& other)
 					remainder.pop_back();
 				}
 				remainder += ++k >= str.size() ? '0' : str[k];
+				remainder_arr.emplace_back(remainder);
 				break;
 			}
 		}
 	}
+	// 输出对应的算式
+	// divide_print(ans, str, other, remainder_arr, tmp_arr);
 	// 先补上缺失的0
 	// string不可以直接在头元素插入，所以先翻转
 	std::reverse(ans.begin(), ans.end());
@@ -205,7 +217,22 @@ string BigDecimal::divide(const string& other)
 	// 再补上小数点的位置
 	int pos = str.size() - other.size() + 1;
 	ans = ans.substr(0, pos) + "." + ans.substr(pos);
-	return ans;
+	// 去除前导0
+	int zero_pos = 0;
+	while (true)
+	{
+		// 当前是0且下一位不是小数点
+		if (ans[zero_pos] == '0' && zero_pos + 1 != pos)
+		{
+			zero_pos++;
+		}
+		else
+		{
+			break;
+		}
+	}
+	ans.erase(0, zero_pos);
+	return format_string(ans);
 }
 
 BigDecimal BigDecimal::divide(const BigDecimal& other)
@@ -367,8 +394,58 @@ void BigDecimal::multiply_print(const string& num1, const string& num2, const st
 	cout << res << "\n";
 }
 
+/**
+* @brief 用于除法的算式输出，在10÷2中，10是被除数，2是除数
+* @param res 除法的结果
+* @param dividend 被除数
+* @param divisor 除数
+* @param remainder_arr 余数数组
+* @param tmp_arr 积数组
+*/
+void BigDecimal::divide_print(const string& res, const string& dividend, const string& divisor, const vector<string>& remainder_arr, const vector<string>& tmp_arr)
+{
+	// 输出上方的东西
+	do
+	{
+		for (int i = 0;i < divisor.size() * 2;i++)
+			cout << " ";
+		cout << res << "\n";
+		for (int i = 0;i < divisor.size();i++)
+			cout << " ";
+		for (int i = 0;i < divisor.size() + res.size();i++)
+			cout << "—";
+		cout << "\n";
+		cout << divisor << ")" << dividend << "\n";
+	} while (0);
+
+	// align控制末位对齐
+	int align = divisor.size() * 2 + 1;
+	for (int i = 0;i < res.size() - 1;i++)
+	{
+		for (int j = 0;j < align - tmp_arr[i].size();j++)
+			cout << " ";
+		cout << tmp_arr[i] << "\n";
+		for (int j = 0;j < align - tmp_arr[i].size() - 1;j++)
+			cout << " ";
+		for (int j = 0;j < tmp_arr[i].size() + 3;j++)
+			cout << "—";
+		cout << "\n";
+		align++;
+		for (int j = 0;j < align - remainder_arr[i].size();j++)
+			cout << " ";
+		cout << remainder_arr[i] << "\n";
+	}
+}
+
+/**
+ * @brief 格式化输出，由于这是大数，这里主要是科学计数法
+ * @brief 主要通过全局变量pf来控制格式化
+ * @param 需要格式化的字符串
+ * @return 格式化完成后的字符串
+ */
 string BigDecimal::format_string(const string& str)
 {
+	cout << "str: " << str << "\n";
 	string res;
 	// 科学计数法，decimal表示实数部分，exp表示指数部分
 	string decimal;
@@ -398,8 +475,8 @@ string BigDecimal::format_string(const string& str)
 	}
 	if (pf.significant_digits == 0)
 	{
-		// 默认保留6位有效数字
-		pf.significant_digits = 6;
+		// 默认保留5位有效数字（即整数1位+小数点后4位）
+		pf.significant_digits = 5;
 	}
 	// 先提取要计算的部分
 	string tmp = decimal.substr(0, 1) + decimal.substr(2, pf.significant_digits);

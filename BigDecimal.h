@@ -38,7 +38,7 @@ public:
 	BigDecimal operator/(const BigDecimal& other);
 	// 检查表达式是否正确
 	static bool check_expression(const string& experssion);
-	void show() const
+	inline void show() const
 	{
 		cout << this->number << "\n";
 	}
@@ -47,10 +47,12 @@ private:
 	static int compare(const string& str1, const string& str2);
 	static void trim(string& str);
 private:
-	// 以下函数用于输出
+	/// 以下函数用于输出
+	// 列乘法算式
 	void multiply_print(const string& num1, const string& num2, const string& res, const vector<string>& arr, const string& file_path);
+	// 列除法算式
+	void divide_print(const string& res, const string& dividend, const string& divisor, const vector<string>& remainder_arr, const vector<string>& tmp_arr);
 	// 以规定的格式返回
-public:
 	static string format_string(const string& str);
 private:
 	string number;
