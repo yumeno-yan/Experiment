@@ -1,7 +1,7 @@
 #include "BigDecimal.h"
 #include "io_handler.h"
 
-print_format pf = { 4 };
+print_format pf = { 4,false };
 
 string BigDecimal::add(const string& other)
 {
@@ -124,7 +124,8 @@ string BigDecimal::multiply(const string& other)
 		// 乘法结果与当前的加法结果相加
 		add_res = mul_res + add_res;
 	}
-	multiply_print(num_a, num_b, add_res.number, mul_res_arr, "");
+	if (pf.equation_output)
+		multiply_print(num_a, num_b, add_res.number, mul_res_arr, "");
 	return add_res.number;
 }
 
@@ -205,7 +206,8 @@ string BigDecimal::divide(const string& other)
 		}
 	}
 	// 输出对应的算式
-	divide_print(ans, str, other, remainder_arr, tmp_arr);
+	if (pf.equation_output)
+		divide_print(ans, str, other, remainder_arr, tmp_arr);
 	// 先补上缺失的0
 	// string不可以直接在头元素插入，所以先翻转
 	std::reverse(ans.begin(), ans.end());
@@ -244,6 +246,42 @@ BigDecimal BigDecimal::divide(const BigDecimal& other)
 BigDecimal BigDecimal::operator/(const BigDecimal& other)
 {
 	return this->divide(other);
+}
+
+/**
+ * @brief 幂运算，这里用到了快速幂
+ */
+string BigDecimal::pow(const string& other)
+{
+	// 幂运算时不输出算式且不进行科学计数法
+	auto flag = pf.equation_output;
+	auto significant_digits = pf.significant_digits;
+	pf.equation_output = false;
+	pf.significant_digits = -1;
+	BigDecimal ans("1");
+	BigDecimal a(this->number);
+	string n = other;
+	int cnt = 8;
+	while (compare(n, "0") > 0 && cnt-- > 0)
+	{
+		if ((n.back() - '0') & 1)
+		{
+			ans = ans * a;
+		}
+		a = a * a;
+		// 这里要达到整除的效果
+		n = BigDecimal(n).divide("2");
+		auto pos = n.find_first_of(".");
+		n = n.substr(0, pos);
+	}
+	pf.equation_output = flag;
+	pf.significant_digits = significant_digits;
+	return ans.number;
+}
+
+BigDecimal BigDecimal::pow(const BigDecimal& other)
+{
+	return this->pow(other.number);
 }
 
 /**
