@@ -250,6 +250,7 @@ BigDecimal BigDecimal::operator/(const BigDecimal& other)
 
 /**
  * @brief 幂运算，这里用到了快速幂
+ * @brief 快速幂的时间复杂度为O(logn)，在大数情景下性能显著提升
  */
 string BigDecimal::pow(const string& other)
 {
@@ -282,6 +283,34 @@ string BigDecimal::pow(const string& other)
 BigDecimal BigDecimal::pow(const BigDecimal& other)
 {
 	return this->pow(other.number);
+}
+
+/**
+ * @brief 采用牛顿迭代法求平方根
+ */
+string BigDecimal::sqrt(const string& other)
+{
+	if (compare(other, "0") == 0)
+	{
+		return "0.00";
+	}
+	auto flag = pf.equation_output;
+	auto significant_digits = pf.significant_digits;
+	pf.equation_output = false;
+	pf.significant_digits = -1;
+
+	string ans;
+	// 初始猜测值为一半
+
+
+	pf.equation_output = flag;
+	pf.significant_digits = significant_digits;
+	return ans;
+}
+
+BigDecimal BigDecimal::sqrt(const BigDecimal& other)
+{
+	return this->sqrt(other.number);
 }
 
 /**
@@ -406,6 +435,23 @@ void BigDecimal::trim(string& str)
 	auto last = str.find_last_not_of(" ");
 	// str替换为first和last之间的位置
 	str = str.substr(first, last - first + 1);
+}
+
+// 带浮点数的加法
+BigDecimal BigDecimal::float_add(const BigDecimal& other)
+{
+	string ans;
+	auto pos1 = this->number.find_first_of(".");
+	auto pos2 = other.number.find_first_of(".");
+	string a_integer = this->number.substr(0, pos1);
+	string a_decimal = this->number.substr(pos1 + 1);
+	string b_integer = other.number.substr(0, pos2);
+	string b_decimal = other.number.substr(pos2 + 1);
+	// 整数部分的和
+	auto integer = BigDecimal(a_integer) + BigDecimal(b_integer);
+	// 小数部分的和
+	auto decimal = BigDecimal(a_decimal) + BigDecimal(b_decimal);
+	return BigDecimal(ans);
 }
 
 /**

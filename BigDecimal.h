@@ -41,6 +41,9 @@ public:
 	// 幂运算
 	string pow(const string& other);
 	BigDecimal pow(const BigDecimal& other);
+	// 求平方根
+	string sqrt(const string& other);
+	BigDecimal sqrt(const BigDecimal& other);
 	// 检查表达式是否正确
 	static bool check_expression(const string& experssion);
 	// 根据一个表达式来计算结果
@@ -54,6 +57,7 @@ private:
 	string multiply_single(const char& single, int zero_num);
 	static int compare(const string& str1, const string& str2);
 	static void trim(string& str);
+	BigDecimal float_add(const BigDecimal& other);
 private:
 	/// 以下函数用于输出
 	// 列乘法算式
