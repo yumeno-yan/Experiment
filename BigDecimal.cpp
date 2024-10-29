@@ -403,7 +403,6 @@ string BigDecimal::format_string(const string& str)
 	}
 	// 先提取要计算的部分
 	string tmp = decimal.substr(0, 1) + decimal.substr(2, pf.significant_digits);
-	cout << tmp << "\n";
 	// 四舍六入五成双
 	int last_digit = tmp.back() - '0';
 	int penultimate_digit = tmp[tmp.size() - 2] - '0';
@@ -414,12 +413,21 @@ string BigDecimal::format_string(const string& str)
 	else
 	{
 		tmp.pop_back();
-		res = (BigDecimal(tmp) + BigDecimal("1")).number;
-		if (res.size() > pf.significant_digits)
+		tmp = (BigDecimal(tmp) + BigDecimal("1")).number;
+		if (tmp.size() > pf.significant_digits)
 		{
-			res.pop_back();
+			exp++;
+			tmp.pop_back();
 		}
 	}
 	res = tmp.substr(0, 1) + "." + tmp.substr(1);
+	if (exp < 0)
+	{
+		res += "e-" + to_string(abs(exp));
+	}
+	else if (exp > 0)
+	{
+		res += "e" + to_string(exp);
+	}
 	return res;
 }
