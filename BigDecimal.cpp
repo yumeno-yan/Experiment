@@ -1,6 +1,6 @@
 #include "BigDecimal.h"
 
-print_format pf = { 2 };
+print_format pf = { 4 };
 
 string BigDecimal::add(const string& other)
 {
