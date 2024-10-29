@@ -21,12 +21,18 @@
     <ClCompile Include="BigDecimal.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="io_handler.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="topn.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="BigDecimal.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="io_handler.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
