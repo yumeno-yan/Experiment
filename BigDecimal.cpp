@@ -266,7 +266,7 @@ bool BigDecimal::check_expression(const string& experssion)
 	trim(num1), trim(num2);
 	// 找到第一个不为数字的字符位置
 	index = num1.find_first_not_of("0123456789");
-	// index不表示不存在则说明num1有问题
+	// index存在则说明num1有问题
 	if (index != string::npos)
 	{
 		return false;
@@ -278,6 +278,34 @@ bool BigDecimal::check_expression(const string& experssion)
 		return false;
 	}
 	return true;
+}
+
+/**
+ * @brief 根据表达式来计算结果
+ * @see 注意调用此函数前必须先调用check_expression确保表达式的正确性!!!
+ * @param experssion 要计算的表达式
+ * @return 计算的结果
+ */
+BigDecimal BigDecimal::calc_experssion(const string& experssion)
+{
+	auto index = experssion.find_first_of("+-*/");
+	string num1 = experssion.substr(0, index);
+	string num2 = experssion.substr(index + 1);
+	trim(num1), trim(num2);
+	BigDecimal x1(num1), x2(num2);
+	switch (experssion[index])
+	{
+	case '+':
+		return x1 + x2;
+	case '-':
+		return x1 - x2;
+	case '*':
+		return x1 * x2;
+	case '/':
+		return x1 / x2;
+	default:
+		return BigDecimal("");
+	}
 }
 
 /**
@@ -352,6 +380,7 @@ void BigDecimal::trim(string& str)
  */
 void BigDecimal::multiply_print(const string& num1, const string& num2, const string& res, const vector<string>& arr, const string& file_path)
 {
+	coh.init("/home/jieyan/Experiment");
 	// 输出第一行乘数
 	for (int i = 0; i < res.size() - num1.size(); i++)
 	{

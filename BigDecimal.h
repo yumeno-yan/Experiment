@@ -39,11 +39,14 @@ public:
 	BigDecimal operator/(const BigDecimal& other);
 	// 检查表达式是否正确
 	static bool check_expression(const string& experssion);
+	// 根据一个表达式来计算结果
+	static BigDecimal calc_experssion(const string& experssion);
 	inline void show() const
 	{
 		cout << this->number << "\n";
 	}
 private:
+	/// 以下为辅助函数
 	string multiply_single(const char& single, int zero_num);
 	static int compare(const string& str1, const string& str2);
 	static void trim(string& str);

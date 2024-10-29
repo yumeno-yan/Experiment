@@ -5,7 +5,7 @@
 #include <iomanip>
 
 /**
- * @brief 读取文件中的字符串
+ * @brief 读取文件中的字符串，这里只读取一行
  * @param file_path 文件路径
  */
 int Ci_handler::read_number(const string& file_path, string& number)
@@ -60,6 +60,7 @@ int Co_handler::init(const string& path)
 Co_handler& Co_handler::operator<<(const string& str)
 {
     cout << str;
-    this->fout << str;
+    if (this->fout.is_open())
+        this->fout << str;
     return *this;
 }

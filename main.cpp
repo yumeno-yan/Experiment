@@ -14,9 +14,10 @@ int main()
 	//}
 	//cout << "\n";
 	pf.significant_digits = 7;
-	BigDecimal a("888484");
-	BigDecimal b("114514");
-	auto ans = a / b;
+	auto ans = BigDecimal::calc_experssion("888484/114514");
+	// BigDecimal a("888484");
+	// BigDecimal b("114514");
+	// auto ans = a / b;
 	ans.show();
 	// pf.significant_digits = 5;
 	// string str = "1.123456";
