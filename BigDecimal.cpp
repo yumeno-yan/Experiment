@@ -453,7 +453,7 @@ BigDecimal BigDecimal::float_add(const BigDecimal& other)
 	// 小数部分需要先补齐至相同位
 	if (a_decimal.size() > b_decimal.size())
 	{
-		for (int i = 0; i<a_decimal.size() - b_decimal.size(); i++)
+		for (int i = 0; i < a_decimal.size() - b_decimal.size(); i++)
 			b_decimal += "0";
 	}
 	else
@@ -539,31 +539,31 @@ void BigDecimal::divide_print(const string& res, const string& dividend, const s
 	// 输出除数，被除数，商
 	do
 	{
-		for (int i = 0;i < divisor.size() * 2;i++)
+		for (int i = 0; i < divisor.size() * 2; i++)
 			coh << " ";
 		coh << res << "\n";
-		for (int i = 0;i < divisor.size();i++)
+		for (int i = 0; i < divisor.size(); i++)
 			coh << " ";
-		for (int i = 0;i < divisor.size() + res.size();i++)
-			coh << "—";
+		for (int i = 0; i < divisor.size() + res.size(); i++)
+			coh << "-";
 		coh << "\n";
 		coh << divisor << ")" << dividend << "\n";
 	} while (0);
 
 	// align控制末位对齐
 	int align = divisor.size() * 2 + 1;
-	for (int i = 0;i < res.size() - 1;i++)
+	for (int i = 0; i < res.size() - 1; i++)
 	{
-		for (int j = 0;j < align - tmp_arr[i].size();j++)
+		for (int j = 0; j < align - tmp_arr[i].size(); j++)
 			coh << " ";
 		coh << tmp_arr[i] << "\n";
-		for (int j = 0;j < align - tmp_arr[i].size() - 1;j++)
+		for (int j = 0; j < align - tmp_arr[i].size() - 1; j++)
 			coh << " ";
-		for (int j = 0;j < tmp_arr[i].size() + 3;j++)
-			coh << "—";
+		for (int j = 0; j < tmp_arr[i].size() + 3; j++)
+			coh << "-";
 		coh << "\n";
 		align++;
-		for (int j = 0;j < align - remainder_arr[i].size();j++)
+		for (int j = 0; j < align - remainder_arr[i].size(); j++)
 			coh << " ";
 		coh << remainder_arr[i] << "\n";
 	}

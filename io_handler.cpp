@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "io_handler.h"
 #include <sstream>
 #include <ctime>
