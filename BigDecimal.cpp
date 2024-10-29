@@ -450,7 +450,24 @@ BigDecimal BigDecimal::float_add(const BigDecimal& other)
 	// 整数部分的和
 	auto integer = BigDecimal(a_integer) + BigDecimal(b_integer);
 	// 小数部分的和
+	// 小数部分需要先补齐至相同位
+	if (a_decimal.size() > b_decimal.size())
+	{
+		for (int i = 0; i<a_decimal.size() - b_decimal.size(); i++)
+			b_decimal += "0";
+	}
+	else
+	{
+		for (int i = 0; i < b_decimal.size() - a_decimal.size(); i++)
+			a_decimal += "0";
+	}
 	auto decimal = BigDecimal(a_decimal) + BigDecimal(b_decimal);
+	if (decimal.number.size() > max(a_decimal.size(), b_decimal.size()))
+	{
+		integer = (BigDecimal(integer) + BigDecimal("1")).number;
+		decimal.number.erase(0, 1);
+	}
+	ans = integer.number + "." + decimal.number;
 	return BigDecimal(ans);
 }
 
