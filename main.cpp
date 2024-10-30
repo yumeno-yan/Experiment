@@ -4,17 +4,29 @@
 
 int main()
 {
-	// coh.init("/home/jieyan/Experiment");
-	// coh << "123\n" << "456";
-	pf.significant_digits = -1;
-	pf.equation_output = false;
-	// auto ans = BigDecimal::calc_experssion("888484/114514");
-	BigDecimal a("999245848455");
-	BigDecimal b("51.99");
-	// auto ans = a.float_add(b);
-	// auto ans = b.float_divide(BigDecimal("2"));
-	auto ans = a.sqrt();
-	ans.show();
+	pf.significant_digits = 6;
+	pf.equation_output = true;
+	// 初始化两个数
+	BigDecimal a("1145141919810");
+	BigDecimal b("888484");
+	// 计算和
+	auto res1 = a + b;
+	res1.show();
+	// 计算差
+	auto res2 = a - b;
+	res2.show();
+	// 计算积
+	auto res3 = a * b;
+	res3.show();
+	// 计算商
+	auto res4 = a / b;
+	res4.show();
+	// 计算幂
+	auto res5 = a.pow(b);
+	// res5.show();
+	// 计算平方根
+	auto res6 = a.sqrt();
+	res6.show();
 	// pf.significant_digits = 5;
 	// string str = "1.123456";
 	// cout << BigDecimal::format_string(str) << "\n";

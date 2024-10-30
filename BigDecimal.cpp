@@ -5,6 +5,9 @@ print_format pf = { 4,false };
 
 string BigDecimal::add(const string& other)
 {
+	pf.equation_output = false;
+	pf.significant_digits = -1;
+
 	string ans;
 	// 倒序遍历
 	// i从当前数的个位开始，j从other的个位开始，add表示进位
@@ -262,8 +265,8 @@ string BigDecimal::pow(const string& other)
 	// 幂运算时不输出算式且不进行科学计数法
 	auto flag = pf.equation_output;
 	auto significant_digits = pf.significant_digits;
-	pf.equation_output = false;
-	pf.significant_digits = -1;
+	pf.equation_output = true;
+	pf.significant_digits = 6;
 	BigDecimal ans("1");
 	BigDecimal a(this->number);
 	string n = other;
@@ -282,6 +285,7 @@ string BigDecimal::pow(const string& other)
 	}
 	pf.equation_output = flag;
 	pf.significant_digits = significant_digits;
+	cout << format_string(ans.number) << "\n";
 	return ans.number;
 }
 
@@ -306,7 +310,7 @@ BigDecimal BigDecimal::sqrt()
 	for (int i = 0;i < (n.number.size() - 1) / 2;i++)
 		initial_value += "0";
 	BigDecimal x(initial_value);
-	int cnt = 20;
+	int cnt = 30;
 	while (cnt-- > 0)
 	{
 		x = x.float_add(n.float_divide(x)).float_divide(BigDecimal("2"));
@@ -683,7 +687,7 @@ string BigDecimal::format_string(const string& str)
 	auto position = str.find_first_of(".");
 	if (position != 1)	// 如果是大数，形如1234.5678
 	{
-		exp += position - 1;
+		exp += position == string::npos ? str.size() - 1 : position - 1;
 		// 将1234.5678分为1 . 234 5678四个部分
 		decimal = str.substr(0, 1) + "." + str.substr(1, position - 1) + str.substr(position + 1);
 	}
