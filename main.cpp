@@ -9,7 +9,7 @@ int main()
 	pf.significant_digits = -1;
 	pf.equation_output = false;
 	// auto ans = BigDecimal::calc_experssion("888484/114514");
-	BigDecimal a("888484");
+	BigDecimal a("999245848455");
 	BigDecimal b("51.99");
 	// auto ans = a.float_add(b);
 	// auto ans = b.float_divide(BigDecimal("2"));

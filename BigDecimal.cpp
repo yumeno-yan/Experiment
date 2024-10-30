@@ -291,28 +291,8 @@ BigDecimal BigDecimal::pow(const BigDecimal& other)
 }
 
 /**
- * @brief 采用牛顿迭代法求平方根
+ * @brief 牛顿迭代法求平方根
  */
-string BigDecimal::sqrt(const string& other)
-{
-	if (compare(other, "0") == 0)
-	{
-		return "0.00";
-	}
-	auto flag = pf.equation_output;
-	auto significant_digits = pf.significant_digits;
-	pf.equation_output = false;
-	pf.significant_digits = -1;
-
-	string ans;
-	// 初始猜测值为一半
-
-
-	pf.equation_output = flag;
-	pf.significant_digits = significant_digits;
-	return ans;
-}
-
 BigDecimal BigDecimal::sqrt()
 {
 	auto flag = pf.equation_output;
@@ -321,20 +301,20 @@ BigDecimal BigDecimal::sqrt()
 	pf.significant_digits = -1;
 
 	auto& n = *this;
-	BigDecimal x("1");
-	int cnt = 40;
-	while (true && cnt-- > 0)
+	// 这里选取比n小一点的10的整数幂作为初始值
+	string initial_value("1");
+	for (int i = 0;i < (n.number.size() - 1) / 2;i++)
+		initial_value += "0";
+	BigDecimal x(initial_value);
+	int cnt = 20;
+	while (cnt-- > 0)
 	{
-		BigDecimal nx = x.float_add(n.float_divide(x)).float_divide(BigDecimal("2"));
-		// cout << "nx: " << nx.number << "\n";
-		// cout << "x - nx: " <<(x - nx).number<<"\n";
-		// if (compare((x - nx).number, "0") == 0)
-		// 	break;
-		x = nx;
+		x = x.float_add(n.float_divide(x)).float_divide(BigDecimal("2"));
 	}
 	pf.equation_output = flag;
 	pf.significant_digits = significant_digits;
 	auto& decimal = x.number;
+	// 保留6位小数
 	decimal = decimal.substr(0, decimal.find_first_of(".") + 7);
 	return x;
 }
