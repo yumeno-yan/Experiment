@@ -43,7 +43,7 @@ public:
 	BigDecimal pow(const BigDecimal& other);
 	// 求平方根
 	string sqrt(const string& other);
-	BigDecimal sqrt(const BigDecimal& other);
+	BigDecimal sqrt();
 	// 检查表达式是否正确
 	static bool check_expression(const string& experssion);
 	// 根据一个表达式来计算结果

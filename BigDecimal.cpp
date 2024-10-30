@@ -141,32 +141,35 @@ BigDecimal BigDecimal::operator*(const BigDecimal& other)
 
 string BigDecimal::divide(const string& other)
 {
-	if (compare(other, "0") == 0)
+	// 去除前导0
+	string str = this->number;
+	string oth = other;
+	auto str_non_zero = str.find_first_not_of("0");
+	auto oth_non_zero = oth.find_first_not_of("0");
+	if (oth_non_zero == string::npos)
 	{
 		return "NaN";
 	}
-	if (compare(this->number, "0") == 0)
+	if (str_non_zero == string::npos)
 	{
 		return "0";
 	}
-	string str = this->number;
+	str.erase(0, str_non_zero);
+	oth.erase(0, oth_non_zero);
+
 	// 记录每次的余数和过程中的积，用于输出算式
 	vector<string> remainder_arr, tmp_arr;
 	// 先将其补到相同位数
-	int point = other.size() > str.size() ? other.size() - str.size() : 0;
+	int point = oth.size() > str.size() ? oth.size() - str.size() : 0;
 	string zero(point, '0');
 	str += std::move(zero);
-	// for (int i = 0; i < point; i++)
-	// {
-	// 	str += "0";
-	// }
 	string ans;
 	// 计算要算的位数：整数部分+保留小数点位数+补0的个数
 	// 这里加上补0个数是为了转为科学计数法方法时防止位数不够
-	int digit_number = str.size() - other.size() + 2 + max(pf.significant_digits, 0) + point;
+	int digit_number = str.size() - oth.size() + 2 + max(pf.significant_digits, 0) + point;
 	// 余数
-	string remainder = str.substr(0, other.size());
-	int k = other.size() - 1;
+	string remainder = str.substr(0, oth.size());
+	int k = oth.size() - 1;
 	for (int i = 0; i <= digit_number; i++)
 	{
 		bool find = false;
@@ -174,7 +177,7 @@ string BigDecimal::divide(const string& other)
 		{
 			if (j != 10)	// j==10的时候说明j一定为9
 			{
-				string tmp = BigDecimal(other).multiply_single((char)(j + '0'), 0);
+				string tmp = BigDecimal(oth).multiply_single((char)(j + '0'), 0);
 				switch (compare(remainder, tmp))
 				{
 				case 0:
@@ -193,7 +196,7 @@ string BigDecimal::divide(const string& other)
 			if (find)
 			{
 				char x = j - 1 + '0';
-				string tmp = BigDecimal(other).multiply_single(x, 0);
+				string tmp = BigDecimal(oth).multiply_single(x, 0);
 				tmp_arr.emplace_back(tmp);
 				ans += x;
 				remainder = BigDecimal(remainder).subtract(tmp);
@@ -209,7 +212,7 @@ string BigDecimal::divide(const string& other)
 	}
 	// 输出对应的算式
 	if (pf.equation_output)
-		divide_print(ans, str, other, remainder_arr, tmp_arr);
+		divide_print(ans, str, oth, remainder_arr, tmp_arr);
 	// 先补上缺失的0
 	// string不可以直接在头元素插入，所以先翻转
 	std::reverse(ans.begin(), ans.end());
@@ -220,7 +223,7 @@ string BigDecimal::divide(const string& other)
 	// 再翻转回来
 	std::reverse(ans.begin(), ans.end());
 	// 再补上小数点的位置
-	int pos = str.size() - other.size() + 1;
+	int pos = str.size() - oth.size() + 1;
 	ans = ans.substr(0, pos) + "." + ans.substr(pos);
 	// 去除前导0
 	int zero_pos = 0;
@@ -310,9 +313,30 @@ string BigDecimal::sqrt(const string& other)
 	return ans;
 }
 
-BigDecimal BigDecimal::sqrt(const BigDecimal& other)
+BigDecimal BigDecimal::sqrt()
 {
-	return this->sqrt(other.number);
+	auto flag = pf.equation_output;
+	auto significant_digits = pf.significant_digits;
+	pf.equation_output = false;
+	pf.significant_digits = -1;
+
+	auto& n = *this;
+	BigDecimal x("1");
+	int cnt = 40;
+	while (true && cnt-- > 0)
+	{
+		BigDecimal nx = x.float_add(n.float_divide(x)).float_divide(BigDecimal("2"));
+		// cout << "nx: " << nx.number << "\n";
+		// cout << "x - nx: " <<(x - nx).number<<"\n";
+		// if (compare((x - nx).number, "0") == 0)
+		// 	break;
+		x = nx;
+	}
+	pf.equation_output = flag;
+	pf.significant_digits = significant_digits;
+	auto& decimal = x.number;
+	decimal = decimal.substr(0, decimal.find_first_of(".") + 7);
+	return x;
 }
 
 /**
@@ -442,13 +466,12 @@ void BigDecimal::trim(string& str)
 // 带浮点数的加法
 BigDecimal BigDecimal::float_add(const BigDecimal& other)
 {
-	string ans;
 	auto pos1 = this->number.find_first_of(".");
 	auto pos2 = other.number.find_first_of(".");
 	string a_integer = this->number.substr(0, pos1);
-	string a_decimal = this->number.substr(pos1 + 1);
+	string a_decimal = pos1 == string::npos ? "" : this->number.substr(pos1 + 1);
 	string b_integer = other.number.substr(0, pos2);
-	string b_decimal = other.number.substr(pos2 + 1);
+	string b_decimal = pos2 == string::npos ? "" : other.number.substr(pos2 + 1);
 	// 整数部分的和
 	auto integer = BigDecimal(a_integer) + BigDecimal(b_integer);
 	// 小数部分的和
@@ -485,8 +508,7 @@ BigDecimal BigDecimal::float_add(const BigDecimal& other)
 			break;
 		}
 	}
-	ans = integer.number + dn;
-	return BigDecimal(ans);
+	return BigDecimal(integer.number + dn);
 }
 
 // 带浮点数的除法
@@ -501,11 +523,12 @@ BigDecimal BigDecimal::float_divide(const BigDecimal& other)
 	int b_count = b_pos == string::npos ? 0 : b_n.size() - b_pos - 1;
 	string a_integer = a_n.substr(0, a_pos) + (a_count == 0 ? "" : a_n.substr(a_pos + 1));
 	string b_integer = b_n.substr(0, b_pos) + (b_count == 0 ? "" : b_n.substr(b_pos + 1));
+	// cout << "a_integer: " << a_integer << ", b_integer: " << b_integer << "\n";
 	BigDecimal res = BigDecimal(a_integer) / BigDecimal(b_integer);
 	auto& rn = res.number;
-	cout << "rn: " << rn << "\n";
+	// cout << "rn: " << rn << "\n";
 	int sub = a_count - b_count;
-	cout << "sub: " << sub << "\n";
+	// cout << "sub: " << sub << "\n";
 	int pos = rn.find_first_of(".");
 	if (sub > 0)	// 小数点前移
 	{
@@ -518,6 +541,7 @@ BigDecimal BigDecimal::float_divide(const BigDecimal& other)
 		}
 		else
 		{
+			cnt = -cnt + 1;
 			string tmp = rn.substr(0, pos);
 			rn = tmp.substr(0, cnt) + "." + tmp.substr(cnt, pos) + rn.substr(pos + 1);
 		}
@@ -526,8 +550,8 @@ BigDecimal BigDecimal::float_divide(const BigDecimal& other)
 	{
 		sub = -sub;
 		// 算一下补几个0
-		int cnt = sub - rn.size() + pos;
-		cout << "cnt: " << cnt << "\n";
+		int cnt = sub - rn.size() + pos + 1;
+		// cout << "cnt: " << cnt << "\n";
 		if (cnt > 0)
 		{
 			string zero(cnt, '0');
@@ -539,6 +563,26 @@ BigDecimal BigDecimal::float_divide(const BigDecimal& other)
 			rn = rn.substr(0, pos) + rn.substr(pos + 1, sub) + "." + rn.substr(pos + 1 + sub);
 		}
 	}
+	// 去除前导0
+	int zero_pos = 0;
+	auto& ans = res.number;
+	pos = ans.find_first_of(".");
+	while (true)
+	{
+		// 当前是0且下一位不是小数点
+		if (ans[zero_pos] == '0' && zero_pos + 1 != pos)
+		{
+			zero_pos++;
+		}
+		else
+		{
+			break;
+		}
+	}
+	ans.erase(0, zero_pos);
+	if (ans.back() == '.')
+		ans.pop_back();
+	// cout << ans << "\n";
 	return res;
 }
 
