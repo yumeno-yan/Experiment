@@ -6,12 +6,12 @@ int main()
 {
 	// coh.init("/home/jieyan/Experiment");
 	// coh << "123\n" << "456";
-	pf.significant_digits = 6;
-	pf.equation_output = true;
+	pf.significant_digits = -1;
+	pf.equation_output = false;
 	// auto ans = BigDecimal::calc_experssion("888484/114514");
-	BigDecimal a("2");
-	BigDecimal b("10");
-	auto ans = a.pow(b);
+	BigDecimal a("1");
+	BigDecimal b("0.17");
+	auto ans = a.float_divide(b);
 	// auto ans = a / b;
 	ans.show();
 	// pf.significant_digits = 5;

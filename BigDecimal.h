@@ -57,7 +57,9 @@ private:
 	string multiply_single(const char& single, int zero_num);
 	static int compare(const string& str1, const string& str2);
 	static void trim(string& str);
+public:
 	BigDecimal float_add(const BigDecimal& other);
+	BigDecimal float_divide(const BigDecimal& other);
 private:
 	/// 以下函数用于输出
 	// 列乘法算式

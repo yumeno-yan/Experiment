@@ -40,12 +40,12 @@ int Co_handler::init(const string& path)
     // 使用put_time格式化输出
     // 这里区分一下windows和linux
     string split;
-#ifdef __WIN32
+#ifdef _WIN32
     split = "\\";
 #else
     split = "/";
 #endif
-    ss << path << "/"
+    ss << path << split
         << std::put_time(std::localtime(&now_c), "%Y-%m-%d_%H:%M:%S")
         << ".txt";
     string file_name(ss.str());

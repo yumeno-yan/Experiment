@@ -154,10 +154,12 @@ string BigDecimal::divide(const string& other)
 	vector<string> remainder_arr, tmp_arr;
 	// 先将其补到相同位数
 	int point = other.size() > str.size() ? other.size() - str.size() : 0;
-	for (int i = 0; i < point; i++)
-	{
-		str += "0";
-	}
+	string zero(point, '0');
+	str += std::move(zero);
+	// for (int i = 0; i < point; i++)
+	// {
+	// 	str += "0";
+	// }
 	string ans;
 	// 计算要算的位数：整数部分+保留小数点位数+补0的个数
 	// 这里加上补0个数是为了转为科学计数法方法时防止位数不够
@@ -451,24 +453,93 @@ BigDecimal BigDecimal::float_add(const BigDecimal& other)
 	auto integer = BigDecimal(a_integer) + BigDecimal(b_integer);
 	// 小数部分的和
 	// 小数部分需要先补齐至相同位
-	if (a_decimal.size() > b_decimal.size())
+	const auto a_size = a_decimal.size(), b_size = b_decimal.size();
+	if (a_size > b_size)
 	{
-		for (int i = 0; i < a_decimal.size() - b_decimal.size(); i++)
+		for (int i = 0; i < a_size - b_size; i++)
 			b_decimal += "0";
 	}
 	else
 	{
-		for (int i = 0; i < b_decimal.size() - a_decimal.size(); i++)
+		for (int i = 0; i < (b_size - a_size); i++)
 			a_decimal += "0";
 	}
 	auto decimal = BigDecimal(a_decimal) + BigDecimal(b_decimal);
+	// 如果进位了需要在整数部分+1，小数部分去除进位
 	if (decimal.number.size() > max(a_decimal.size(), b_decimal.size()))
 	{
 		integer = (BigDecimal(integer) + BigDecimal("1")).number;
 		decimal.number.erase(0, 1);
 	}
-	ans = integer.number + "." + decimal.number;
+	// 最后处理一下末尾的0
+	auto& dn = decimal.number;
+	dn = "." + dn;
+	for (int i = dn.size() - 1;i >= 0;i--)
+	{
+		if (dn[i] == '0' || dn[i] == '.')
+		{
+			dn.pop_back();
+		}
+		else
+		{
+			break;
+		}
+	}
+	ans = integer.number + dn;
 	return BigDecimal(ans);
+}
+
+// 带浮点数的除法
+BigDecimal BigDecimal::float_divide(const BigDecimal& other)
+{
+	// 记录下除数和被除数的小数位数
+	// a_number b_number各自对应原始的字符串
+	auto& a_n = this->number, b_n = other.number;
+	// an和bn各自对应的小数点的位置
+	auto a_pos = a_n.find_first_of("."), b_pos = b_n.find_first_of(".");
+	int a_count = a_pos == string::npos ? 0 : a_n.size() - a_pos - 1;
+	int b_count = b_pos == string::npos ? 0 : b_n.size() - b_pos - 1;
+	string a_integer = a_n.substr(0, a_pos) + (a_count == 0 ? "" : a_n.substr(a_pos + 1));
+	string b_integer = b_n.substr(0, b_pos) + (b_count == 0 ? "" : b_n.substr(b_pos + 1));
+	BigDecimal res = BigDecimal(a_integer) / BigDecimal(b_integer);
+	auto& rn = res.number;
+	cout << "rn: " << rn << "\n";
+	int sub = a_count - b_count;
+	cout << "sub: " << sub << "\n";
+	int pos = rn.find_first_of(".");
+	if (sub > 0)	// 小数点前移
+	{
+		// 算一下要补几个0
+		int cnt = sub - pos + 1;
+		if (cnt > 0)
+		{
+			string zero(cnt, '0');
+			rn = zero[0] + "." + zero.substr(1) + rn.substr(0, pos) + rn.substr(pos + 1);
+		}
+		else
+		{
+			string tmp = rn.substr(0, pos);
+			rn = tmp.substr(0, cnt) + "." + tmp.substr(cnt, pos) + rn.substr(pos + 1);
+		}
+	}
+	else if (sub < 0) // 小数点后移
+	{
+		sub = -sub;
+		// 算一下补几个0
+		int cnt = sub - rn.size() + pos;
+		cout << "cnt: " << cnt << "\n";
+		if (cnt > 0)
+		{
+			string zero(cnt, '0');
+			rn += std::move(zero);
+			rn = rn.substr(0, pos) + rn.substr(pos + 1);
+		}
+		else
+		{
+			rn = rn.substr(0, pos) + rn.substr(pos + 1, sub) + "." + rn.substr(pos + 1 + sub);
+		}
+	}
+	return res;
 }
 
 /**
