@@ -22,11 +22,11 @@ int main()
 	auto res4 = a / b;
 	res4.show();
 	// 计算幂
-	auto res5 = a.pow(b);
+	// auto res5 = a.pow(b);
 	// res5.show();
 	// 计算平方根
-	auto res6 = a.sqrt();
-	res6.show();
+	// auto res6 = a.sqrt();
+	// res6.show();
 	// pf.significant_digits = 5;
 	// string str = "1.123456";
 	// cout << BigDecimal::format_string(str) << "\n";
