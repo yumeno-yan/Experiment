@@ -5,6 +5,8 @@ print_format pf = { 4,false };
 
 string BigDecimal::add(const string& other)
 {
+	auto flag = pf.equation_output;
+	auto significant_digits = pf.significant_digits;
 	pf.equation_output = false;
 	pf.significant_digits = -1;
 
@@ -25,6 +27,8 @@ string BigDecimal::add(const string& other)
 	}
 	// 计算完以后的答案需要翻转过来
 	std::reverse(ans.begin(), ans.end());
+	pf.equation_output = flag;
+	pf.significant_digits = significant_digits;
 	return ans;
 }
 
@@ -113,7 +117,7 @@ string BigDecimal::multiply(const string& other)
 		num_b = this->number;
 		break;
 	default:
-		break;;
+		break;
 	}
 	// 遍历较小数的每一位，使其与较大数相乘，记录结果并相加
 	BigDecimal add_res("0"), mul_res("");
@@ -128,7 +132,16 @@ string BigDecimal::multiply(const string& other)
 		add_res = mul_res + add_res;
 	}
 	if (pf.equation_output)
-		multiply_print(num_a, num_b, add_res.number, mul_res_arr, "");
+	{
+		string path;
+#ifdef _WIN32
+		path = "E:\\log";
+#else
+		path = "/home/jieyan/Experiment";
+#endif
+		cout << "path: " << path << "\n";
+		multiply_print(num_a, num_b, add_res.number, mul_res_arr, path);
+	}
 	return add_res.number;
 }
 
@@ -393,7 +406,7 @@ BigDecimal BigDecimal::calc_experssion(const string& experssion)
 string BigDecimal::multiply_single(const char& single, int zero_num = 0)
 {
 	string ans;
-	const auto& str = this->number;
+	string_view str = this->number;
 	int tmp = 0;
 	for (int i = str.size() - 1; i >= 0; i--)
 	{
@@ -580,7 +593,7 @@ BigDecimal BigDecimal::float_divide(const BigDecimal& other)
  */
 void BigDecimal::multiply_print(const string& num1, const string& num2, const string& res, const vector<string>& arr, const string& file_path)
 {
-	coh.init("/home/jieyan/Experiment");
+	coh.init(file_path);
 	// 输出第一行乘数
 	for (int i = 0; i < res.size() - num1.size(); i++)
 	{
@@ -634,7 +647,13 @@ void BigDecimal::multiply_print(const string& num1, const string& num2, const st
 */
 void BigDecimal::divide_print(const string& res, const string& dividend, const string& divisor, const vector<string>& remainder_arr, const vector<string>& tmp_arr)
 {
-	coh.init("/home/jieyan/Experiment");
+	string path;
+#ifdef _WIN32
+	path = "E:\\log";
+#else
+	path = "/home/jieyan/Experiment";
+#endif
+	coh.init(path);
 	// 输出除数，被除数，商
 	do
 	{
