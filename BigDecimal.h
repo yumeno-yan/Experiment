@@ -56,7 +56,7 @@ public:
 	// 检查表达式是否正确
 	static bool check_expression(const string& experssion);
 	// 根据一个表达式来计算结果
-	static BigDecimal calc_experssion(const string& experssion);
+	static BigDecimal calc_expression(const string& experssion);
 	// 输出this->number
 	inline void show() const
 	{

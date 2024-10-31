@@ -320,6 +320,7 @@ BigDecimal BigDecimal::sqrt()
  */
 bool BigDecimal::check_expression(const string& experssion)
 {
+	cout << experssion << "\n";
 	// 第一步根据运算符将表达式分割为num1 operator num2三部分
 	auto index = experssion.find_first_of("+-*/");
 	// 没找到就返回false
@@ -353,7 +354,7 @@ bool BigDecimal::check_expression(const string& experssion)
  * @param experssion 要计算的表达式
  * @return 计算的结果
  */
-BigDecimal BigDecimal::calc_experssion(const string& experssion)
+BigDecimal BigDecimal::calc_expression(const string& experssion)
 {
 	auto index = experssion.find_first_of("+-*/");
 	string num1 = experssion.substr(0, index);
@@ -741,11 +742,11 @@ string BigDecimal::format_string(string_view str)
 	res = tmp.substr(0, 1) + "." + tmp.substr(1);
 	if (exp < 0)
 	{
-		res += "e-" + to_string(abs(exp));
+		res += "E-" + to_string(abs(exp));
 	}
 	else if (exp > 0)
 	{
-		res += "e" + to_string(exp);
+		res += "E+" + to_string(exp);
 	}
 	return res;
 }
