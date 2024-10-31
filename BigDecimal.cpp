@@ -1,15 +1,16 @@
 #include "BigDecimal.h"
 #include "io_handler.h"
 
-print_format pf = { 4,false };
+print_format pf = { 4,false,
+#ifdef _WIN32
+		"E:\\log"
+#else
+		"/home/jieyan/Experiment"
+#endif 
+};
 
 string BigDecimal::add(const string& other)
 {
-	auto flag = pf.equation_output;
-	auto significant_digits = pf.significant_digits;
-	pf.equation_output = false;
-	pf.significant_digits = -1;
-
 	string ans;
 	// 倒序遍历
 	// i从当前数的个位开始，j从other的个位开始，add表示进位
@@ -27,8 +28,6 @@ string BigDecimal::add(const string& other)
 	}
 	// 计算完以后的答案需要翻转过来
 	std::reverse(ans.begin(), ans.end());
-	pf.equation_output = flag;
-	pf.significant_digits = significant_digits;
 	return ans;
 }
 
@@ -45,7 +44,7 @@ BigDecimal BigDecimal::operator+(const BigDecimal& other)
 string BigDecimal::subtract(const string& other)
 {
 	// 先比较大小，让大的减小的
-	string num_a, num_b;
+	string_view num_a, num_b;
 	// 记录负号
 	bool minus = false;
 	switch (compare(this->number, other))
@@ -77,17 +76,14 @@ string BigDecimal::subtract(const string& other)
 		i--;
 		j--;
 	}
-	// 去除前导0
-	while (ans.size() > 0 && ans.back() == '0')
-	{
-		ans.pop_back();
-	}
 	if (minus && ans.size() > 0)
 	{
 		ans += "-";
 	}
 	// 计算完以后的答案需要翻转过来
 	std::reverse(ans.begin(), ans.end());
+	// 去除前导0
+	remove_lead_zero(ans);
 	return ans;
 }
 
@@ -104,7 +100,7 @@ BigDecimal BigDecimal::operator-(const BigDecimal& other)
 string BigDecimal::multiply(const string& other)
 {
 	// 比较大小，让大的乘以小的
-	string num_a, num_b;
+	string_view num_a, num_b;
 	switch (compare(this->number, other))
 	{
 	case 0:
@@ -126,21 +122,14 @@ string BigDecimal::multiply(const string& other)
 	for (int i = num_b.size() - 1; i >= 0; i--)
 	{
 		// 先记录每一次乘法的结果
-		mul_res = BigDecimal(num_a).multiply_single(num_b[i], num_b.size() - i - 1);
+		mul_res = BigDecimal(num_a.data()).multiply_single(num_b[i], num_b.size() - i - 1);
 		mul_res_arr.emplace_back(mul_res.number);
 		// 乘法结果与当前的加法结果相加
 		add_res = mul_res + add_res;
 	}
 	if (pf.equation_output)
 	{
-		string path;
-#ifdef _WIN32
-		path = "E:\\log";
-#else
-		path = "/home/jieyan/Experiment";
-#endif
-		cout << "path: " << path << "\n";
-		multiply_print(num_a, num_b, add_res.number, mul_res_arr, path);
+		multiply_print(num_a, num_b, add_res.number, mul_res_arr);
 	}
 	return add_res.number;
 }
@@ -160,18 +149,16 @@ string BigDecimal::divide(const string& other)
 	// 去除前导0
 	string str = this->number;
 	string oth = other;
-	auto str_non_zero = str.find_first_not_of("0");
-	auto oth_non_zero = oth.find_first_not_of("0");
-	if (oth_non_zero == string::npos)
+	remove_lead_zero(str);
+	remove_lead_zero(oth);
+	if (oth == "0")
 	{
 		return "NaN";
 	}
-	if (str_non_zero == string::npos)
+	if (str == "0")
 	{
 		return "0";
 	}
-	str.erase(0, str_non_zero);
-	oth.erase(0, oth_non_zero);
 
 	// 记录每次的余数和过程中的积，用于输出算式
 	vector<string> remainder_arr, tmp_arr;
@@ -193,7 +180,7 @@ string BigDecimal::divide(const string& other)
 		{
 			if (j != 10)	// j==10的时候说明j一定为9
 			{
-				string tmp = BigDecimal(oth).multiply_single((char)(j + '0'), 0);
+				string tmp = std::move(BigDecimal(oth).multiply_single((char)(j + '0'), 0));
 				switch (compare(remainder, tmp))
 				{
 				case 0:
@@ -212,11 +199,12 @@ string BigDecimal::divide(const string& other)
 			if (find)
 			{
 				char x = j - 1 + '0';
-				string tmp = BigDecimal(oth).multiply_single(x, 0);
-				tmp_arr.emplace_back(tmp);
+				string tmp = std::move(BigDecimal(oth).multiply_single(x, 0));
 				ans += x;
 				remove_lead_zero(tmp);
-				remainder = BigDecimal(remainder).subtract(tmp);
+				tmp_arr.emplace_back(tmp);
+				remainder = std::move(BigDecimal(remainder).subtract(tmp));
+				remove_lead_zero(remainder);
 				if (remainder == "0")
 				{
 					remainder.pop_back();
@@ -244,7 +232,7 @@ string BigDecimal::divide(const string& other)
 	ans = ans.substr(0, pos) + "." + ans.substr(pos);
 	// 去除前导0
 	remove_lead_zero(ans);
-	return format_string(ans);
+	return ans;
 }
 
 BigDecimal BigDecimal::divide(const BigDecimal& other)
@@ -268,26 +256,24 @@ string BigDecimal::pow(const string& other)
 	auto significant_digits = pf.significant_digits;
 	pf.equation_output = false;
 	pf.significant_digits = -1;
+
 	BigDecimal ans("1");
 	BigDecimal a(this->number);
 	string n = other;
-	int cnt = 8;
+	// 加个cnt防止死循环
+	int cnt = 80;
 	while (compare(n, "0") > 0 && cnt-- > 0)
 	{
-		cout << "n: " << n << "\n";
 		if ((n.back() - '0') & 1)
 		{
 			ans = ans * a;
 		}
 		a = a * a;
 		// 这里要达到整除的效果
-		n = BigDecimal(n).divide("2");
-		cout << "n divide: " << n << "\n";
+		n = std::move(BigDecimal(n).divide("2"));
 		auto pos = n.find_first_of(".");
-		n = n.substr(0, pos);
+		n = std::move(n.substr(0, pos));
 	}
-	pf.significant_digits = 6;
-	cout << format_string(ans.number) << "\n";
 	pf.equation_output = flag;
 	pf.significant_digits = significant_digits;
 	return ans.number;
@@ -317,18 +303,12 @@ BigDecimal BigDecimal::sqrt()
 	int cnt = 30;
 	while (cnt-- > 0)
 	{
-		// auto tmp = n.float_divide(x);
-		// // cout << "float_divide: " << tmp.number << "\n";
-		// tmp = x.float_add(tmp);
-		// // cout << "float_add: " << tmp.number << "\n";
-		// x = tmp.float_divide(BigDecimal("2"));
-		// cout << "x: " << x.number << "\n";
-		x = x.float_add(n.float_divide(x)).float_divide(BigDecimal("2"));
+		x = std::move(x.float_add(n.float_divide(x)).float_divide(BigDecimal("2")));
 	}
 	pf.equation_output = flag;
 	pf.significant_digits = significant_digits;
 	auto& decimal = x.number;
-	// 保留6位小数
+	// 最多保留6位小数
 	decimal = decimal.substr(0, decimal.find_first_of(".") + 7);
 	return x;
 }
@@ -424,7 +404,8 @@ string BigDecimal::multiply_single(const char& single, int zero_num = 0)
 }
 
 // 比较str1和str2的大小，str1大返回1，相等返回0，str2返回-1
-int BigDecimal::compare(const string& str1, const string& str2)
+// 这里只比较整数
+int BigDecimal::compare(string_view str1, string_view str2)
 {
 	// 位数更多的一定更大
 	if (str1.size() > str2.size())
@@ -508,7 +489,10 @@ BigDecimal BigDecimal::float_add(const BigDecimal& other)
 // 去除前导0，对小数和整数都适用
 void BigDecimal::remove_lead_zero(string& str)
 {
-	int zero_pos = 0;
+	int negative = 0;
+	if (str[0] == '-')
+		negative = 1;
+	int zero_pos = negative;
 	auto pos = str.find_first_of(".");
 	while (zero_pos < str.size() - 1)
 	{
@@ -522,7 +506,7 @@ void BigDecimal::remove_lead_zero(string& str)
 			break;
 		}
 	}
-	str.erase(0, zero_pos);
+	str.erase(negative, zero_pos - negative);
 }
 
 // 带浮点数的除法
@@ -537,12 +521,10 @@ BigDecimal BigDecimal::float_divide(const BigDecimal& other)
 	int b_count = b_pos == string::npos ? 0 : b_n.size() - b_pos - 1;
 	string a_integer = a_n.substr(0, a_pos) + (a_count == 0 ? "" : a_n.substr(a_pos + 1));
 	string b_integer = b_n.substr(0, b_pos) + (b_count == 0 ? "" : b_n.substr(b_pos + 1));
-	// cout << "a_integer: " << a_integer << ", b_integer: " << b_integer << "\n";
+
 	BigDecimal res = BigDecimal(a_integer) / BigDecimal(b_integer);
 	auto& rn = res.number;
-	// cout << "rn: " << rn << "\n";
 	int sub = a_count - b_count;
-	// cout << "sub: " << sub << "\n";
 	int pos = rn.find_first_of(".");
 	if (sub > 0)	// 小数点前移
 	{
@@ -578,25 +560,10 @@ BigDecimal BigDecimal::float_divide(const BigDecimal& other)
 		}
 	}
 	// 去除前导0
-	int zero_pos = 0;
 	auto& ans = res.number;
-	pos = ans.find_first_of(".");
-	while (true)
-	{
-		// 当前是0且下一位不是小数点
-		if (ans[zero_pos] == '0' && zero_pos + 1 != pos)
-		{
-			zero_pos++;
-		}
-		else
-		{
-			break;
-		}
-	}
-	ans.erase(0, zero_pos);
+	remove_lead_zero(ans);
 	if (ans.back() == '.')
 		ans.pop_back();
-	// cout << ans << "\n";
 	return res;
 }
 
@@ -608,9 +575,9 @@ BigDecimal BigDecimal::float_divide(const BigDecimal& other)
  * @param arr 乘法过程中每一位的积
  * @param file_path 输出到文件的路径
  */
-void BigDecimal::multiply_print(const string& num1, const string& num2, const string& res, const vector<string>& arr, const string& file_path)
+void BigDecimal::multiply_print(string_view num1, string_view num2, string_view res, const vector<string>& arr)
 {
-	coh.init(file_path);
+	coh.init(pf.dir_path);
 	// 输出第一行乘数
 	for (int i = 0; i < res.size() - num1.size(); i++)
 	{
@@ -705,34 +672,42 @@ void BigDecimal::divide_print(const string& res, const string& dividend, const s
 }
 
 /**
- * @brief 格式化输出，由于这是大数，这里主要是科学计数法
+ * @brief 格式化输出，由于这是大数，这里主要是科学计数法，采用string_view提高性能
  * @brief 主要通过全局变量pf来控制格式化
  * @param 需要格式化的字符串
  * @return 格式化完成后的字符串
  */
-string BigDecimal::format_string(const string& str)
+string BigDecimal::format_string(string_view str)
 {
+	if (pf.significant_digits == -1)
+		return str.data();
 	string res;
 	// 科学计数法，decimal表示实数部分，exp表示指数部分
 	string decimal;
+	// 预先分配空间提高性能
+	decimal.reserve(str.size());
 	int exp = 0;
-	if (pf.significant_digits == -1)
-		return str;
-	// 如果要使用科学计数法
 	// 先找到小数点的位置
 	auto position = str.find_first_of(".");
 	if (position != 1)	// 如果是大数，形如1234.5678
 	{
 		exp += position == string::npos ? str.size() - 1 : position - 1;
 		// 将1234.5678分为1 . 234 5678四个部分
-		decimal = str.substr(0, 1) + "." + str.substr(1, position - 1) + str.substr(position + 1);
+		decimal.append(str.substr(0, 1));
+		decimal.append(".");
+		decimal.append(str.substr(1, position - 1));
+		if (position != string::npos)
+			decimal.append(str.substr(position + 1));
 	}
 	else if (str[0] == '0')	// 如果是较小数，形如0.000123456
 	{
 		// 找到第一个非0的位置
 		auto non_zero_position = str.find_first_not_of("0.");
 		exp -= non_zero_position - position;
-		decimal = str.substr(non_zero_position, 1) + "." + str.substr(non_zero_position + 1);
+		decimal.append(str.substr(non_zero_position, 1));
+		decimal.append(".");
+		decimal.append(str.substr(non_zero_position + 1));
+		// decimal = str.substr(non_zero_position, 1) + "." + str.substr(non_zero_position + 1);
 	}
 	else	// 形如1.114514
 	{

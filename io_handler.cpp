@@ -26,7 +26,7 @@ Co_handler coh;
 /**
  * @brief 绑定一个目录的路径，在其中创建一个文件保存算式和输出的结果
  */
-int Co_handler::init(const string& path)
+int Co_handler::init(string_view path)
 {
     // 先关闭文件句柄
     if (this->fout.is_open())
@@ -58,7 +58,7 @@ int Co_handler::init(const string& path)
     return 0;
 }
 
-Co_handler& Co_handler::operator<<(const string& str)
+Co_handler& Co_handler::operator<<(string_view str)
 {
     cout << str;
     if (this->fout.is_open())

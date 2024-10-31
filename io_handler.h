@@ -8,8 +8,8 @@ using namespace std;
 class Co_handler
 {
 public:
-    int init(const string& file_path);
-    Co_handler& operator<<(const string& str);
+    int init(string_view file_path);
+    Co_handler& operator<<(string_view str);
 private:
     ofstream fout;      // 文件句柄
     string dir_path;    // 文件夹路径
