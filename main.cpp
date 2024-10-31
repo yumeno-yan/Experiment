@@ -5,7 +5,7 @@
 int main()
 {
 	pf.significant_digits = 6;
-	pf.equation_output = true;
+	pf.equation_output = false;
 	// 初始化两个数
 	BigDecimal a("1145141919810");
 	BigDecimal b("888484");
@@ -16,18 +16,18 @@ int main()
 	//auto res2 = a - b;
 	//res2.show();
 	// 计算积
-	auto res3 = a * b;
-	res3.show();
+	// auto res3 = a * b;
+	// res3.show();
 	// 计算商
-	auto res4 = a / b;
-	res4.show();
-	 
+	// auto res4 = a / b;
+	// res4.show();
+
 	// 计算幂
-	 //auto res5 = a.pow(BigDecimal("8"));
-	 //res5.show();
+	//  auto res5 = a.pow(BigDecimal("5"));
+	//  res5.show();
 	// 计算平方根
-	 //auto res6 = b.sqrt();
-	 //res6.show();
+	auto res6 = a.sqrt();
+	res6.show();
 	// pf.significant_digits = 5;
 	// string str = "1.123456";
 	// cout << BigDecimal::format_string(str) << "\n";

@@ -57,6 +57,8 @@ private:
 	static int compare(const string& str1, const string& str2);
 	static void trim(string& str);
 	BigDecimal float_add(const BigDecimal& other);
+public:
+	static void remove_lead_zero(string& str);
 	BigDecimal float_divide(const BigDecimal& other);
 private:
 	/// 以下函数用于输出

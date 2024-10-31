@@ -215,6 +215,7 @@ string BigDecimal::divide(const string& other)
 				string tmp = BigDecimal(oth).multiply_single(x, 0);
 				tmp_arr.emplace_back(tmp);
 				ans += x;
+				remove_lead_zero(tmp);
 				remainder = BigDecimal(remainder).subtract(tmp);
 				if (remainder == "0")
 				{
@@ -242,20 +243,7 @@ string BigDecimal::divide(const string& other)
 	int pos = str.size() - oth.size() + 1;
 	ans = ans.substr(0, pos) + "." + ans.substr(pos);
 	// 去除前导0
-	int zero_pos = 0;
-	while (true)
-	{
-		// 当前是0且下一位不是小数点
-		if (ans[zero_pos] == '0' && zero_pos + 1 != pos)
-		{
-			zero_pos++;
-		}
-		else
-		{
-			break;
-		}
-	}
-	ans.erase(0, zero_pos);
+	remove_lead_zero(ans);
 	return format_string(ans);
 }
 
@@ -275,17 +263,18 @@ BigDecimal BigDecimal::operator/(const BigDecimal& other)
  */
 string BigDecimal::pow(const string& other)
 {
-	// 幂运算时不输出算式且不进行科学计数法
+	// 幂运算时不输出算式且进行科学计数法
 	auto flag = pf.equation_output;
 	auto significant_digits = pf.significant_digits;
-	pf.equation_output = true;
-	pf.significant_digits = 6;
+	pf.equation_output = false;
+	pf.significant_digits = -1;
 	BigDecimal ans("1");
 	BigDecimal a(this->number);
 	string n = other;
 	int cnt = 8;
 	while (compare(n, "0") > 0 && cnt-- > 0)
 	{
+		cout << "n: " << n << "\n";
 		if ((n.back() - '0') & 1)
 		{
 			ans = ans * a;
@@ -293,12 +282,14 @@ string BigDecimal::pow(const string& other)
 		a = a * a;
 		// 这里要达到整除的效果
 		n = BigDecimal(n).divide("2");
+		cout << "n divide: " << n << "\n";
 		auto pos = n.find_first_of(".");
 		n = n.substr(0, pos);
 	}
+	pf.significant_digits = 6;
+	cout << format_string(ans.number) << "\n";
 	pf.equation_output = flag;
 	pf.significant_digits = significant_digits;
-	cout << format_string(ans.number) << "\n";
 	return ans.number;
 }
 
@@ -326,6 +317,12 @@ BigDecimal BigDecimal::sqrt()
 	int cnt = 30;
 	while (cnt-- > 0)
 	{
+		// auto tmp = n.float_divide(x);
+		// // cout << "float_divide: " << tmp.number << "\n";
+		// tmp = x.float_add(tmp);
+		// // cout << "float_add: " << tmp.number << "\n";
+		// x = tmp.float_divide(BigDecimal("2"));
+		// cout << "x: " << x.number << "\n";
 		x = x.float_add(n.float_divide(x)).float_divide(BigDecimal("2"));
 	}
 	pf.equation_output = flag;
@@ -506,6 +503,26 @@ BigDecimal BigDecimal::float_add(const BigDecimal& other)
 		}
 	}
 	return BigDecimal(integer.number + dn);
+}
+
+// 去除前导0，对小数和整数都适用
+void BigDecimal::remove_lead_zero(string& str)
+{
+	int zero_pos = 0;
+	auto pos = str.find_first_of(".");
+	while (zero_pos < str.size() - 1)
+	{
+		// 当前是0且下一位不是小数点
+		if (str[zero_pos] == '0' && zero_pos + 1 != pos)
+		{
+			zero_pos++;
+		}
+		else
+		{
+			break;
+		}
+	}
+	str.erase(0, zero_pos);
 }
 
 // 带浮点数的除法
