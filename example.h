@@ -8,11 +8,11 @@ void example()
 {
     // 从文件读取两个数字
     string num1, num2;
-    if (Ci_handler::read_number("../num1.txt", num1) != 0)
+    if (Ci_handler::read_number("num1.txt", num1) != 0)
     {
         return;
     }
-    if (Ci_handler::read_number("../num2.txt", num2) != 0)
+    if (Ci_handler::read_number("num2.txt", num2) != 0)
     {
         return;
     }

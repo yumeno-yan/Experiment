@@ -137,6 +137,10 @@
     <ClInclude Include="io_handler.h" />
     <ClInclude Include="topn.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="num1.txt" />
+    <Text Include="num2.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
