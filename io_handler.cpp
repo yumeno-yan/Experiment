@@ -18,6 +18,14 @@ int Ci_handler::read_number(const string& file_path, string& number)
         return -1;
     }
     getline(in, number);
+    // 数字的合法性校验
+    auto pos = number.find_first_not_of("0123456789");
+    if (pos != string::npos)
+    {
+        // 出现了非数字字符
+        cerr << "invalid number\n";
+        return -2;
+    }
     return 0;
 }
 
@@ -26,7 +34,7 @@ Co_handler coh;
 /**
  * @brief 绑定一个目录的路径，在其中创建一个文件保存算式和输出的结果
  */
-int Co_handler::init(string_view path)
+int Co_handler::init(string_view path, string_view fun_name)
 {
     // 先关闭文件句柄
     if (this->fout.is_open())
@@ -46,7 +54,8 @@ int Co_handler::init(string_view path)
     split = "/";
 #endif
     ss << path << split
-        << std::put_time(std::localtime(&now_c), "%Y-%m-%d_%H-%M-%S")
+        << std::put_time(std::localtime(&now_c), "%Y-%m-%d_%H-%M-%S_")
+        << fun_name
         << ".txt";
     string file_name(ss.str());
     this->fout.open(file_name);

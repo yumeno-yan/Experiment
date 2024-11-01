@@ -49,7 +49,7 @@ public:
 	BigDecimal divide(const BigDecimal& other);
 	BigDecimal operator/(const BigDecimal& other);
 	// 幂运算
-	string pow(const string& other);
+	BigDecimal pow(const string& other);
 	BigDecimal pow(const BigDecimal& other);
 	// 求平方根
 	BigDecimal sqrt();

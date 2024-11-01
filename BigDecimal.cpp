@@ -249,7 +249,7 @@ BigDecimal BigDecimal::operator/(const BigDecimal& other)
  * @brief 幂运算，这里用到了快速幂
  * @brief 快速幂的时间复杂度为O(logn)，在大数情景下性能显著提升
  */
-string BigDecimal::pow(const string& other)
+BigDecimal BigDecimal::pow(const string& other)
 {
 	// 幂运算时不输出算式且进行科学计数法
 	auto flag = pf.equation_output;
@@ -276,7 +276,7 @@ string BigDecimal::pow(const string& other)
 	}
 	pf.equation_output = flag;
 	pf.significant_digits = significant_digits;
-	return ans.number;
+	return ans;
 }
 
 BigDecimal BigDecimal::pow(const BigDecimal& other)
@@ -300,7 +300,7 @@ BigDecimal BigDecimal::sqrt()
 	for (int i = 0;i < (n.number.size() - 1) / 2;i++)
 		initial_value += "0";
 	BigDecimal x(initial_value);
-	int cnt = 30;
+	int cnt = 80;
 	while (cnt-- > 0)
 	{
 		x = std::move(x.float_add(n.float_divide(x)).float_divide(BigDecimal("2")));
@@ -356,7 +356,7 @@ bool BigDecimal::check_expression(const string& experssion)
  */
 BigDecimal BigDecimal::calc_expression(const string& experssion)
 {
-	auto index = experssion.find_first_of("+-*/");
+	auto index = experssion.find_first_of("+-*/^");
 	string num1 = experssion.substr(0, index);
 	string num2 = experssion.substr(index + 1);
 	trim(num1), trim(num2);
@@ -371,6 +371,8 @@ BigDecimal BigDecimal::calc_expression(const string& experssion)
 		return x1 * x2;
 	case '/':
 		return x1 / x2;
+	case '^':
+		return x1.pow(x2);
 	default:
 		return BigDecimal("");
 	}
@@ -578,7 +580,8 @@ BigDecimal BigDecimal::float_divide(const BigDecimal& other)
  */
 void BigDecimal::multiply_print(string_view num1, string_view num2, string_view res, const vector<string>& arr)
 {
-	coh.init(pf.dir_path);
+	coh.init(pf.dir_path, "multiply");
+	coh << "\n";
 	// 输出第一行乘数
 	for (int i = 0; i < res.size() - num1.size(); i++)
 	{
@@ -619,7 +622,7 @@ void BigDecimal::multiply_print(string_view num1, string_view num2, string_view 
 	}
 	coh << "\n";
 	// 输出最后的积
-	coh << res << "\n";
+	coh << res << "\n\n";
 }
 
 /**
@@ -638,10 +641,11 @@ void BigDecimal::divide_print(const string& res, const string& dividend, const s
 #else
 	path = "/home/jieyan/Experiment";
 #endif
-	coh.init(path);
+	coh.init(path, "divide");
 	// 输出除数，被除数，商
 	do
 	{
+		coh << "\n";
 		for (int i = 0; i < divisor.size() * 2; i++)
 			coh << " ";
 		coh << res << "\n";
@@ -660,9 +664,9 @@ void BigDecimal::divide_print(const string& res, const string& dividend, const s
 		for (int j = 0; j < align - tmp_arr[i].size(); j++)
 			coh << " ";
 		coh << tmp_arr[i] << "\n";
-		for (int j = 0; j < align - tmp_arr[i].size() - 1; j++)
+		for (int j = 0; j < align - remainder_arr[i].size() - 1; j++)
 			coh << " ";
-		for (int j = 0; j < tmp_arr[i].size() + 3; j++)
+		for (int j = 0; j < remainder_arr[i].size() + 3; j++)
 			coh << "-";
 		coh << "\n";
 		align++;
@@ -670,6 +674,7 @@ void BigDecimal::divide_print(const string& res, const string& dividend, const s
 			coh << " ";
 		coh << remainder_arr[i] << "\n";
 	}
+	coh << "\n";
 }
 
 /**
@@ -722,10 +727,9 @@ string BigDecimal::format_string(string_view str)
 	}
 	// 先提取要计算的部分
 	string tmp = decimal.substr(0, 1) + decimal.substr(2, pf.significant_digits);
-	// 四舍六入五成双
+	// 四舍五入
 	int last_digit = tmp.back() - '0';
-	int penultimate_digit = tmp[tmp.size() - 2] - '0';
-	if (last_digit < 4 || (last_digit == 5 && penultimate_digit % 2 == 0))
+	if (last_digit <= 4)
 	{
 		tmp.pop_back();
 	}

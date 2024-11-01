@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -8,7 +9,7 @@ using namespace std;
 class Co_handler
 {
 public:
-    int init(string_view file_path);
+    int init(string_view file_path, string_view fun_name);
     Co_handler& operator<<(string_view str);
 private:
     ofstream fout;      // 文件句柄
