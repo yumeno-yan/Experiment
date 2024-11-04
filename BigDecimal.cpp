@@ -627,7 +627,7 @@ void BigDecimal::multiply_print(string_view num1, string_view num2, string_view 
 * @param remainder_arr 余数数组
 * @param tmp_arr 积数组
 */
-void BigDecimal::divide_print(const string& res, const string& dividend, const string& divisor, const vector<string>& remainder_arr, const vector<string>& tmp_arr)
+void BigDecimal::divide_print(string_view res, string_view dividend, string_view divisor, const vector<string>& remainder_arr, const vector<string>& tmp_arr)
 {
 	coh.init(pf.dir_path, "divide");
 	// 输出除数，被除数，商

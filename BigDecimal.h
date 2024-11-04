@@ -80,7 +80,7 @@ private:
 	// 列乘法算式
 	void multiply_print(string_view num1, string_view num2, string_view res, const vector<string>& arr);
 	// 列除法算式
-	void divide_print(const string& res, const string& dividend, const string& divisor, const vector<string>& remainder_arr, const vector<string>& tmp_arr);
+	void divide_print(string_view res, string_view dividend, string_view divisor, const vector<string>& remainder_arr, const vector<string>& tmp_arr);
 	// 以规定的格式返回
 	static string format_string(string_view str);
 private:
