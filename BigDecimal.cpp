@@ -1,13 +1,7 @@
 #include "BigDecimal.h"
 #include "io_handler.h"
 
-print_format pf = { 4,false,
-#ifdef _WIN32
-		"E:\\log"
-#else
-		"/home/jieyan/Experiment"
-#endif 
-};
+print_format pf = { 4,false,"E:\\log"};
 
 string BigDecimal::add(const string& other)
 {
@@ -635,13 +629,7 @@ void BigDecimal::multiply_print(string_view num1, string_view num2, string_view 
 */
 void BigDecimal::divide_print(const string& res, const string& dividend, const string& divisor, const vector<string>& remainder_arr, const vector<string>& tmp_arr)
 {
-	string path;
-#ifdef _WIN32
-	path = "E:\\log";
-#else
-	path = "/home/jieyan/Experiment";
-#endif
-	coh.init(path, "divide");
+	coh.init(pf.dir_path, "divide");
 	// 输出除数，被除数，商
 	do
 	{

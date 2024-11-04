@@ -47,12 +47,7 @@ int Co_handler::init(string_view path, string_view fun_name)
     stringstream ss;
     // 使用put_time格式化输出
     // 这里区分一下windows和linux
-    string split;
-#ifdef _WIN32
-    split = "\\";
-#else
-    split = "/";
-#endif
+    string split = "\\";
     ss << path << split
         << std::put_time(std::localtime(&now_c), "%Y-%m-%d_%H-%M-%S_")
         << fun_name
