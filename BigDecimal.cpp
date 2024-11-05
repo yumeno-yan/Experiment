@@ -1,7 +1,7 @@
 #include "BigDecimal.h"
 #include "io_handler.h"
 
-print_format pf = { 4,false,"E:\\log"};
+print_format pf = { 4,false,"E:\\log" };
 
 string BigDecimal::add(const string& other)
 {
@@ -307,6 +307,15 @@ BigDecimal BigDecimal::sqrt()
 	return x;
 }
 
+bool BigDecimal::check_number(string& num)
+{
+	trim(num);
+	auto pos = num.find_first_not_of("0123456789");
+	if (pos == string::npos && !num.empty())
+		return true;
+	return false;
+}
+
 /**
  * @brief 检查输入的表达式是否合法
  * @param experssion 待检查的表达式
@@ -314,7 +323,6 @@ BigDecimal BigDecimal::sqrt()
  */
 bool BigDecimal::check_expression(const string& experssion)
 {
-	cout << experssion << "\n";
 	// 第一步根据运算符将表达式分割为num1 operator num2三部分
 	auto index = experssion.find_first_of("+-*/");
 	// 没找到就返回false

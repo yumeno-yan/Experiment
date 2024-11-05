@@ -9,7 +9,7 @@
  * @brief 读取文件中的字符串，这里只读取一行
  * @param file_path 文件路径
  */
-int Ci_handler::read_number(const string& file_path, string& number)
+int Ci_handler::read_str(const string& file_path, string& str)
 {
     ifstream in(file_path);
     if (!in.is_open())
@@ -17,15 +17,7 @@ int Ci_handler::read_number(const string& file_path, string& number)
         cerr << "open file error\n";
         return -1;
     }
-    getline(in, number);
-    // 数字的合法性校验
-    auto pos = number.find_first_not_of("0123456789");
-    if (pos != string::npos)
-    {
-        // 出现了非数字字符
-        cerr << "invalid number\n";
-        return -2;
-    }
+    getline(in, str);
     return 0;
 }
 

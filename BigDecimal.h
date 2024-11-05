@@ -53,6 +53,8 @@ public:
 	BigDecimal pow(const BigDecimal& other);
 	// 求平方根
 	BigDecimal sqrt();
+	// 检查数字是否正确
+	static bool check_number(string& num);
 	// 检查表达式是否正确
 	static bool check_expression(const string& experssion);
 	// 根据一个表达式来计算结果

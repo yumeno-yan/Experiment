@@ -22,5 +22,5 @@ extern Co_handler coh;
 class Ci_handler
 {
 public:
-    static int read_number(const string& file_path, string& number);
+    static int read_str(const string& file_path, string& number);
 };
